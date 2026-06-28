@@ -98,11 +98,6 @@ password prompt:
 
 After this, `sudo` runs with no prompt (test with `sudo -n true`).
 
-> **Security note.** This grants full passwordless root to anyone who can SSH in as
-> `<user>`. That's an acceptable trade-off here because the account is an isolated
-> sandbox with no personal data and SSH is key-only. To narrow it, replace `ALL` with
-> a specific command, e.g. `NOPASSWD: /usr/bin/pmset, /usr/sbin/scutil`.
-
 ---
 
 ## 4. Find the target's address (hostname or IP)
