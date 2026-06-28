@@ -159,7 +159,7 @@ ssh <user>@<target-host>.local whoami
 
 ---
 
-## 6. Keep the target awake (prevent sleep)
+## 6. Keep the target awake
 
 By default macOS sleeps after ~10 minutes idle, **even on AC power**, which takes it
 off the network. For a headless remote box you want it to never sleep while plugged in.
