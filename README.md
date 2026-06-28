@@ -76,8 +76,8 @@ unless your terminal app has Full Disk Access. To grant it:
 ## 3. Passwordless sudo for the target account
 
 So the agent (and your SSH commands) can run admin tasks - `pmset`, `scutil`,
-installs - without a password prompt each time. Run it **once** (over SSH now that
-login is on, or at the target itself - it asks for the login password this one time):
+installs - without a password prompt each time. Run this **once on the target** (it
+asks for the login password this one time):
 
 ```bash
 echo "<user> ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/<user>-nopasswd >/dev/null
