@@ -26,10 +26,11 @@ to control it from your main machine.
 
 ## 1. Start fresh on the target Mac
 
-### Wipe it first (recommended for a hand-me-down)
+### Wipe it first (if it has any personal data)
 
-If the target still has old data on it, erase it so nothing personal is left for the
-agent to reach:
+You'll be giving the agent full access to this machine, so it can reach anything stored
+on it. If there's existing data you don't want it to have access to, erase the machine
+first:
 
 - **Macs that support it:** System Settings -> General -> Transfer or Reset ->
   **Erase All Content and Settings**.
