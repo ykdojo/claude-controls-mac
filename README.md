@@ -85,9 +85,6 @@ System Settings -> General -> Sharing, shown as `Local hostname`.
 > ```bash
 > sudo scutil --set LocalHostName newmacbook   # -> newmacbook.local
 > ```
->
-> Note: a `.local` name only resolves while the target is **awake** - a sleeping Mac
-> stops advertising over Bonjour, so the name won't resolve at all (see section 7).
 
 **IP address.** Run on the target:
 
