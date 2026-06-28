@@ -233,26 +233,3 @@ ssh <user>@<target-host>.local
 ```
 
 Then run `claude` and follow the login prompts.
-
----
-
-## Remote access (different networks)
-
-Everything above works only on the **same local network**. To reach the target from
-anywhere without exposing it to the internet, add [Tailscale](https://tailscale.com) on
-both Macs - it gives each a stable private IP that works from any network, still
-end-to-end encrypted, no router port-forwarding.
-
----
-
-## Quick reference
-
-| Action | Command (run on source Mac) |
-| --- | --- |
-| Shell on target | `ssh <user>@<target-host>.local` |
-| Run Claude Code on target | `ssh -t <user>@<target-host>.local 'claude'` |
-| Send clipboard to target | `sendclip` |
-| Pull clipboard from target | `getclip` |
-| Target's Wi-Fi IP (run on target) | `ipconfig getifaddr en0` |
-| Stop the target sleeping | `ssh <user>@<target-host>.local 'sudo pmset -c sleep 0 && sudo pmset -c disablesleep 1'` |
-| Check it won't sleep | `ssh <user>@<target-host>.local 'pmset -g \| grep -i sleep'` |
