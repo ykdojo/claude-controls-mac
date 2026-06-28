@@ -165,18 +165,20 @@ macOS ships `pbcopy` (write clipboard) and `pbpaste` (read clipboard). Piped ove
 they move the clipboard between machines - encrypted, peer-to-peer, no account, no
 third-party service.
 
-Add to `~/.zshrc` on the **source** Mac:
+We'll set up two aliases: `sendclip` pushes your clipboard from the source to the
+target, and `getclip` pulls the target's clipboard back to the source. Add them to
+`~/.zshrc` on the **source** Mac:
 
 ```bash
 # --- Target Mac clipboard over SSH ---
 NEWMAC="<user>@<target-host>.local"
-alias sendclip='pbpaste | ssh "$NEWMAC" pbcopy'   # source -> target
-alias getclip='ssh "$NEWMAC" pbpaste | pbcopy'    # target -> source
+alias sendclip='pbpaste | ssh "$NEWMAC" pbcopy'
+alias getclip='ssh "$NEWMAC" pbpaste | pbcopy'
 ```
 
-Then `source ~/.zshrc`.
+Then run `source ~/.zshrc` to load them.
 
-Usage - the commands take **no arguments**; they act on your system clipboard:
+The commands take **no arguments** - they act on your system clipboard:
 
 - **sendclip**: copy on the source (Cmd-C), run `sendclip`, paste on the target (Cmd-V).
 - **getclip**: copy on the target (Cmd-C), run `getclip`, paste on the source (Cmd-V).
