@@ -35,8 +35,7 @@ first:
 - **Macs that support it:** System Settings -> General -> Transfer or Reset ->
   **Erase All Content and Settings**.
 - **Older Intel Macs (or to repartition):** restart into Recovery (hold **Cmd-R** at
-  boot), use **Disk Utility** to erase the internal drive, then reinstall macOS. Delete
-  any leftover **Boot Camp / Windows** partition while you're there.
+  boot), use **Disk Utility** to erase the internal drive, then reinstall macOS.
 
 Optionally update to the latest macOS afterward (System Settings -> General ->
 Software Update).
