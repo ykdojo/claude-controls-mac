@@ -126,8 +126,7 @@ System Settings -> General -> Sharing, shown as `Local hostname`.
 ipconfig getifaddr en0          # e.g. 192.168.1.80
 ```
 
-The IP comes from DHCP and can change after a reboot or when the lease expires. If you
-want a fixed IP, add a DHCP reservation in your router.
+The IP comes from DHCP and can change after a reboot or when the lease expires.
 
 > Throughout the rest of this guide, replace `<user>` with the target account name and
 > `<target-host>` with the hostname from above (so the address is
