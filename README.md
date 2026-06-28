@@ -69,8 +69,7 @@ sudo systemsetup -setremotelogin on
 If the command fails with `Turning Remote Login on or off requires Full Disk Access
 privileges`, give your terminal app Full Disk Access first:
 
-- System Settings -> Privacy & Security -> **Full Disk Access** (scroll the privacy
-  list to find it).
+- System Settings -> Privacy & Security -> **Full Disk Access**.
 - Click **+**, then in the file picker go to **Applications -> Utilities -> Terminal**
   and add it.
 - Quit and reopen the terminal, then rerun the command.
