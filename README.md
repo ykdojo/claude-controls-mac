@@ -113,9 +113,8 @@ Add `.local` to form the address: `<target-host>.local`. You can also read it fr
 System Settings -> General -> Sharing, shown as `Local hostname`.
 
 > **Give the target a unique name.** Each Mac needs a `.local` name that's unique on
-> your network. Spare Macs often share the same default name, and if two machines
-> share one, the address can point to the wrong Mac. Make sure the target's name is
-> unique - rename it if needed:
+> your network. If two machines share a name, the address can point to the wrong Mac.
+> Make sure the target's name is unique - rename it if needed:
 >
 > ```bash
 > sudo scutil --set LocalHostName newmacbook   # -> newmacbook.local
