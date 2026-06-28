@@ -181,10 +181,8 @@ ssh <user>@<target-host>.local      # then run: claude
 
 ## 7. Keep the target awake (prevent sleep)
 
-By default macOS sleeps after ~10 minutes idle, **even on AC power**. A sleeping Mac
-drops off the network: SSH connections fail with `Host is down` / `Operation timed
-out`, and its `.local` name stops resolving entirely. For a headless remote box you
-want it to never sleep while plugged in.
+By default macOS sleeps after ~10 minutes idle, **even on AC power**, which takes it
+off the network. For a headless remote box you want it to never sleep while plugged in.
 
 Run on the target (or over SSH from the source):
 
