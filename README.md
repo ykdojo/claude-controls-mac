@@ -200,13 +200,14 @@ The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the 
 ssh <user>@<target-host>.local 'echo '\''export PATH="$HOME/.local/bin:$PATH"'\'' >> ~/.zshrc'
 ```
 
-Then **open a fresh terminal session on the target** (or SSH in interactively) and run
-`claude` to log in - the login flow is interactive, so it needs a real terminal, not a
-one-shot SSH command.
+Finally, log in to Claude Code. SSH in interactively (or open a fresh terminal on the
+target) - the login flow needs a real terminal, not a one-shot SSH command:
 
 ```bash
-ssh <user>@<target-host>.local      # then run: claude
+ssh <user>@<target-host>.local
 ```
+
+Then run `claude` and follow the login prompts.
 
 ---
 
