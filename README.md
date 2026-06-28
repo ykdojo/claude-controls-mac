@@ -46,7 +46,29 @@ sudoers file. This incident has been reported to the administrator.`).
 
 ---
 
-## 2. Enable Remote Login (SSH) on the target Mac
+## 2. Passwordless sudo for the target account
+
+So the agent (and your SSH commands) can run admin tasks - `pmset`, `scutil`,
+installs - without a password prompt each time. Run **once on the target** (it asks
+for the login password this one time):
+
+```bash
+echo "<user> ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/<user>-nopasswd >/dev/null
+sudo chmod 440 /etc/sudoers.d/<user>-nopasswd
+sudo visudo -cf /etc/sudoers.d/<user>-nopasswd   # validate - must print 'parsed OK'
+```
+
+Always validate with `visudo -cf`: a syntax error in a sudoers file can lock you out
+of `sudo` entirely. After this, `sudo -n true` succeeds with no prompt.
+
+> **Security note.** This grants full passwordless root to anyone who can SSH in as
+> `<user>`. That's an acceptable trade-off here because the account is an isolated
+> sandbox with no personal data and SSH is key-only. To narrow it, replace `ALL` with
+> a specific command, e.g. `NOPASSWD: /usr/bin/pmset, /usr/sbin/scutil`.
+
+---
+
+## 3. Enable Remote Login (SSH) on the target Mac
 
 **Method used here (verified):** `sudo systemsetup -setremotelogin on`
 
@@ -61,7 +83,7 @@ unless your terminal app has Full Disk Access. To grant it:
 
 ---
 
-## 3. Find the target's address (hostname or IP)
+## 4. Find the target's address (hostname or IP)
 
 You can reach the target by either a hostname or an IP. Use the **hostname**: it stays
 the same, while the IP can change.
@@ -74,6 +96,17 @@ scutil --get LocalHostName      # prints the hostname, e.g. MacBook-Pro
 
 Add `.local` to form the address: `<target-host>.local`. You can also read it from
 System Settings -> General -> Sharing, shown as `Local hostname`.
+
+> **Give the target a unique name.** A spare Mac often ships with the same default
+> name as your main Mac (e.g. both are `YKs-MacBook-Pro` -> `yks-macbook-pro.local`).
+> `.local` (mDNS/Bonjour) is case-insensitive, so two machines with the same name
+> **collide** - Bonjour silently renames one with a `-2` suffix and the address
+> becomes unpredictable. Rename the target to something unique so its `.local`
+> address always points to it:
+>
+> ```bash
+> sudo scutil --set LocalHostName newmacbook   # -> newmacbook.local
+> ```
 
 **IP address.** Run on the target:
 
@@ -90,7 +123,7 @@ want a fixed IP, add a DHCP reservation in your router.
 
 ---
 
-## 4. Set up passwordless SSH from the source Mac
+## 5. Set up passwordless SSH from the source Mac
 
 On the **source** Mac:
 
@@ -117,7 +150,7 @@ ssh <user>@<target-host>.local
 
 ---
 
-## 5. Clipboard sync over SSH
+## 6. Clipboard sync over SSH
 
 macOS ships `pbcopy` (write clipboard) and `pbpaste` (read clipboard). Piped over SSH,
 they move the clipboard between machines - encrypted, peer-to-peer, no account, no
@@ -143,7 +176,7 @@ Handles multi-line text, code, URLs - anything plain text.
 
 ---
 
-## 6. Install Claude Code on the target Mac
+## 7. Install Claude Code on the target Mac
 
 Send the install command over and run it. From the source Mac you can push it straight
 to the target's clipboard, or run it remotely:
@@ -168,6 +201,30 @@ ssh <user>@<target-host>.local      # then run: claude
 
 ---
 
+## 8. Keep the target awake (prevent sleep)
+
+By default macOS sleeps after ~10 minutes idle, **even on AC power**, which takes it
+off the network. For a headless remote box you want it to never sleep while plugged in.
+
+Run on the target (or over SSH from the source):
+
+```bash
+sudo pmset -c sleep 0          # never system-sleep while on AC power (-c = on charger)
+sudo pmset -c disablesleep 1   # also prevents sleep with the lid closed (clamshell)
+```
+
+Verify:
+
+```bash
+pmset -g | grep -iE 'sleep'    # 'sleep 0' and 'SleepDisabled 1' confirm it
+```
+
+The display can still sleep (`displaysleep`) - that's fine, it doesn't drop the
+network. If the machine runs on battery sometimes, use `-a` instead of `-c` to apply
+to all power sources (at the cost of battery drain).
+
+---
+
 ## Remote access (different networks)
 
 Everything above works only on the **same local network**. To reach the target from
@@ -186,3 +243,5 @@ end-to-end encrypted, no router port-forwarding.
 | Send clipboard to target | `sendclip` |
 | Pull clipboard from target | `getclip` |
 | Target's Wi-Fi IP (run on target) | `ipconfig getifaddr en0` |
+| Stop the target sleeping | `ssh <user>@<target-host>.local 'sudo pmset -c sleep 0 && sudo pmset -c disablesleep 1'` |
+| Check it won't sleep | `ssh <user>@<target-host>.local 'pmset -g \| grep -i sleep'` |
