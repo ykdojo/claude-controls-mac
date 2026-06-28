@@ -173,8 +173,10 @@ sudo pmset -c disablesleep 1   # also prevents sleep with the lid closed (clamsh
 Verify:
 
 ```bash
-pmset -g | grep -iE 'sleep'    # 'sleep 0' and 'SleepDisabled 1' confirm it
+pmset -g | grep -iE 'sleep'
 ```
+
+`sleep 0` and `SleepDisabled 1` in the output confirm it worked.
 
 The display can still sleep (`displaysleep`) - that's fine, it doesn't drop the
 network. If the machine runs on battery sometimes, use `-a` instead of `-c` to apply
