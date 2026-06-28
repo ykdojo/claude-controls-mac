@@ -60,10 +60,15 @@ sudoers file. This incident has been reported to the administrator.`).
 
 ## 2. Enable Remote Login (SSH) on the target Mac
 
-**Method used here (verified):** `sudo systemsetup -setremotelogin on`
+On the **target**, turn on SSH so the source Mac can connect. Either flip
+System Settings -> General -> Sharing -> **Remote Login** on, or run:
 
-This fails with `Turning Remote Login on or off requires Full Disk Access privileges`
-unless your terminal app has Full Disk Access. To grant it:
+```bash
+sudo systemsetup -setremotelogin on
+```
+
+If the command fails with `Turning Remote Login on or off requires Full Disk Access
+privileges`, give your terminal app Full Disk Access first:
 
 - System Settings -> Privacy & Security -> **Full Disk Access** (scroll the privacy
   list to find it).
