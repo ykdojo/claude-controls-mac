@@ -60,8 +60,7 @@ sudoers file. This incident has been reported to the administrator.`).
 
 ## 2. Enable Remote Login (SSH) on the target Mac
 
-On the **target**, turn on SSH so the source Mac can connect. Either flip
-System Settings -> General -> Sharing -> **Remote Login** on, or run:
+On the **target**, turn on SSH so the source Mac can connect:
 
 ```bash
 sudo systemsetup -setremotelogin on
