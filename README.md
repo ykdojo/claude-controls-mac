@@ -232,15 +232,6 @@ The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the 
 ssh <user>@<target-host>.local 'echo '\''export PATH="$HOME/.local/bin:$PATH"'\'' >> ~/.zshrc'
 ```
 
-Finally, log in to Claude Code. SSH in interactively (or open a fresh terminal on the
-target) - the login flow needs a real terminal, not a one-shot SSH command:
-
-```bash
-ssh <user>@<target-host>.local
-```
-
-Then run `claude` and follow the login prompts.
-
 ---
 
 ## 9. Set up an opinionated Claude Code environment (optional)
@@ -267,3 +258,23 @@ ssh <user>@<target-host>.local 'bash -s -- --all' < setup-claude-env.sh
 ```
 
 The script is idempotent (OK to re-run).
+
+---
+
+## 10. Log in to Claude and GitHub
+
+Both logins are interactive, so SSH in with a real terminal (not a one-shot command):
+
+```bash
+ssh <user>@<target-host>.local
+```
+
+Then, on the target:
+
+```bash
+claude         # drops into the interactive login for your Anthropic (Claude) account
+gh auth login  # sign in to GitHub
+```
+
+Follow the prompts in each. Both offer a browser/device-code flow, so you can finish
+the sign-in from a browser on your main Mac - no browser needed on the target.
