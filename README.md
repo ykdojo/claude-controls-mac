@@ -331,13 +331,14 @@ run `bash setup-computer-use.sh --uninstall` on the target to remove the LaunchA
 
 ### Use it from your Mac
 
-Add an alias on the **source** Mac (like the clipboard aliases above):
+Add an alias on the **source** Mac (like the clipboard aliases above). Here `ic` stands for
+"isolated claude":
 
 ```bash
-alias boxclaude='ssh <user>@<target-host>.local -t "pgrep -x claude >/dev/null 2>&1 || screen -S cc -X screen zsh -c claude; exec screen -U -x cc"'
+alias ic='ssh <user>@<target-host>.local -t "pgrep -x claude >/dev/null 2>&1 || screen -S cc -X screen zsh -c claude; exec screen -U -x cc"'
 ```
 
 It starts `claude` in the `cc` session if it isn't already running (`zsh -c` so `claude`
-is found on PATH via `~/.zshenv`), then attaches. Run `boxclaude` to drive `claude` with
+is found on PATH via `~/.zshenv`), then attaches. Run `ic` to drive `claude` with
 computer use. Detach with **Ctrl-A** then **D** (don't exit `claude` - the session stays up
-either way, and re-running `boxclaude` reattaches to the same session).
+either way, and re-running `ic` reattaches to the same session).
