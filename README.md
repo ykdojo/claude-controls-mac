@@ -331,14 +331,28 @@ run `bash setup-computer-use.sh --uninstall` on the target to remove the LaunchA
 
 ### Use it from your Mac
 
-Add an alias on the **source** Mac (like the clipboard aliases above). Here `ic` stands for
-"isolated claude":
+Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the **source** Mac and point it at
+the target:
 
 ```bash
-alias ic='ssh <user>@<target-host>.local -t "pgrep -x claude >/dev/null 2>&1 || screen -S cc -X screen zsh -c claude; exec screen -U -x cc"'
+curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic
+chmod +x ~/.local/bin/ic
+echo 'export IC_BOX="<user>@<target-host>.local"' >> ~/.zshrc   # or edit the default in the script
 ```
 
-It starts `claude` in the `cc` session if it isn't already running (`zsh -c` so `claude`
-is found on PATH via `~/.zshenv`), then attaches. Run `ic` to drive `claude` with
-computer use. Detach with **Ctrl-A** then **D** (don't exit `claude` - the session stays up
-either way, and re-running `ic` reattaches to the same session).
+Each `ic` invocation spawns its **own** `claude` session on the box (so you can run several
+independent conversations at once) and attaches to it. It mirrors `claude`'s own flags:
+
+```bash
+ic            # new claude session
+ic -c         # continue the most recent conversation (forwards to: claude -c)
+ic -r         # resume picker (forwards to: claude -r)
+ic ls         # list live sessions on the box
+ic a [id]     # attach a running session (alias: ic attach; bare = attach if only one)
+```
+
+Detach with **Ctrl-A** then **D** - the session keeps running on the box; reattach with
+`ic a <id>`. Sessions are spawned through the persistent `cc` anchor so they inherit the GUI
+login session, which is what makes computer use work. (Only one session should drive the GUI
+at a time - separate text conversations are fine in parallel, but two doing computer use at
+once would fight over the one mouse and keyboard.)

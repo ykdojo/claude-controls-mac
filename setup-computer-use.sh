@@ -7,9 +7,10 @@
 # Why it's needed: macOS ties Screen Recording + Accessibility to the GUI login
 # session, so a process launched over SSH can't reach the display. This installs
 # a LaunchAgent that keeps a `screen` session ("cc") alive *inside* the GUI
-# session; `claude` runs inside it as a child of the granted `screen` binary, so
-# computer use inherits the permissions and the display. Attach over SSH with
-# `screen -r cc`.
+# session. That `cc` session is an anchor: the `ic` helper (ic.sh) spawns each
+# claude in its own child `screen` session through it, so every claude is a
+# descendant of the granted `screen` binary and inherits the GUI permissions and
+# display. (claude is found on PATH via ~/.zshenv; see step 0 below.)
 #
 # PREREQUISITES (one-time, manual - macOS blocks scripting these):
 #   System Settings > Privacy & Security:
@@ -48,7 +49,7 @@ command -v jq >/dev/null || { echo "jq is required"; exit 1; }
 [ -x /usr/bin/screen ] || { echo "/usr/bin/screen not found"; exit 1; }
 
 # 0. ~/.zshenv (read by *every* zsh, unlike ~/.zshrc which is interactive-only):
-#    - PATH so `zsh -c claude` (used by the attach alias) finds claude.
+#    - PATH so `claude` is found when `ic` spawns it in a fresh screen session.
 #    - LANG so claude's TUI renders UTF-8 (launchd gives the session no locale).
 if ! grep -q '.local/bin' "$HOME/.zshenv" 2>/dev/null; then
   log "Adding ~/.local/bin to ~/.zshenv (needed for 'zsh -c claude')"
@@ -117,5 +118,6 @@ echo "Next:"
 echo "  1. One-time grants (if not done) in System Settings > Privacy & Security:"
 echo "       Screen Recording -> + -> /usr/bin/screen -> on"
 echo "       Accessibility    -> + -> /usr/bin/screen -> on"
-echo "  2. From your Mac, attach and run claude (needs Pro/Max):"
-echo "       ssh <user>@<host>.local -t 'screen -r $SESSION || screen -S $SESSION -X screen claude; screen -r $SESSION'"
+echo "  2. On your Mac, install the 'ic' helper and run claude (needs Pro/Max):"
+echo "       curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic && chmod +x ~/.local/bin/ic"
+echo "       export IC_BOX=<user>@<host>.local   # then:  ic   (new)   ic -c   ic ls   ic a <id>"
