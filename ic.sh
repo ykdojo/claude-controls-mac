@@ -40,6 +40,8 @@ Usage:
   ic sh              a plain shell on the box (no claude; alias: ic shell)
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it)
+  ic history         stored conversations: count, location, recent (alias: hist)
+  ic search <term>   search stored conversations for <term>
   ic ls              list live sessions on the box
   ic a [id]          attach a running session (alias: ic attach)
                        no id + exactly one session -> attaches it
@@ -106,6 +108,56 @@ case "${1:-}" in
     ssh "$BOX" "screen -S $ANCHOR -X screen zsh -c 'screen -U -dmS $sess claude remote-control --permission-mode bypassPermissions $*'; \
                 for _ in \$(seq 25); do screen -ls 2>/dev/null | grep -q $sess && break; sleep 0.2; done"
     exec ssh "$BOX" -t "screen -U -x $sess"
+    ;;
+
+  history|hist)
+    # Overview of stored conversations for the box's project ($HOME). Each ic
+    # session runs in $HOME, so they all collect in one project dir.
+    ssh "$BOX" 'bash -s' <<'RSCRIPT'
+proj=$(echo "$HOME" | sed 's:/:-:g')
+d="$HOME/.claude/projects/$proj"
+ls "$d"/*.jsonl >/dev/null 2>&1 || { echo "No conversations yet in $d"; exit 0; }
+n=$(ls "$d"/*.jsonl | wc -l | tr -d ' ')
+size=$(du -sh "$d" 2>/dev/null | awk '{print $1}')
+echo "Conversations (project $HOME)"
+echo "  $d"
+echo "  $n total · ${size:-?}"
+echo ""
+echo "  recent:"
+ls -t "$d"/*.jsonl | head -10 | while read -r f; do
+  id=$(basename "$f" .jsonl)
+  when=$(stat -f '%Sm' -t '%b %d %H:%M' "$f" 2>/dev/null)
+  msgs=$(wc -l < "$f" | tr -d ' ')
+  prev=$(jq -rs '[.[]|select(.type=="user")][0].message.content
+          | if type=="array" then (map(select(.type=="text").text)|join(" ")) else . end' \
+          "$f" 2>/dev/null | tr '\n\t' '  ' | sed 's/  */ /g' | cut -c1-54)
+  printf "  %.8s  %-12s  %4s msg  %s\n" "$id" "$when" "$msgs" "$prev"
+done
+echo ""
+echo "  open/continue:  ic -r            (resume picker)"
+echo "  search:         ic search <term>"
+RSCRIPT
+    ;;
+
+  search)
+    shift
+    [ $# -gt 0 ] || { echo "usage: ic search <term>"; exit 1; }
+    ssh "$BOX" "bash -s -- $(printf '%q' "$*")" <<'RSCRIPT'
+proj=$(echo "$HOME" | sed 's:/:-:g')
+d="$HOME/.claude/projects/$proj"
+q="$1"
+any=0
+for f in "$d"/*.jsonl; do
+  [ -e "$f" ] || continue
+  c=$(grep -ic -- "$q" "$f" 2>/dev/null || true)
+  [ "${c:-0}" -gt 0 ] || continue
+  id=$(basename "$f" .jsonl)
+  when=$(stat -f '%Sm' -t '%b %d %H:%M' "$f" 2>/dev/null)
+  printf "  %.8s  %-12s  %s matches\n" "$id" "$when" "$c"
+  any=1
+done
+[ "$any" -eq 1 ] || echo "  no matches for: $q"
+RSCRIPT
     ;;
 
   kill|k)

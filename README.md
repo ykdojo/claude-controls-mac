@@ -357,6 +357,8 @@ ic -c         # continue the most recent conversation (forwards to: claude -c)
 ic -r         # resume picker (forwards to: claude -r)
 ic sh         # a plain shell on the box, no claude (alias: ic shell)
 ic rc         # Remote Control: drive the box from your phone (claude remote-control)
+ic history    # stored conversations: count, location, recent w/ previews (alias: hist)
+ic search <t> # search stored conversations for a term
 ic ls         # list live sessions on the box
 ic a [id]     # attach a running session (alias: ic attach; bare = attach if only one)
 ic kill [id]  # kill a session (alias: ic k); "ic kill all" kills all; bare = the only one
