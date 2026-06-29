@@ -47,12 +47,16 @@ uninstall() {
 command -v jq >/dev/null || { echo "jq is required"; exit 1; }
 [ -x /usr/bin/screen ] || { echo "/usr/bin/screen not found"; exit 1; }
 
-# 0. Ensure ~/.local/bin is on PATH for *non-interactive* zsh too (~/.zshenv, not
-#    ~/.zshrc). The attach alias starts claude with `zsh -c claude`, which only
-#    sees PATH from .zshenv - without this, `claude` isn't found.
+# 0. ~/.zshenv (read by *every* zsh, unlike ~/.zshrc which is interactive-only):
+#    - PATH so `zsh -c claude` (used by the attach alias) finds claude.
+#    - LANG so claude's TUI renders UTF-8 (launchd gives the session no locale).
 if ! grep -q '.local/bin' "$HOME/.zshenv" 2>/dev/null; then
   log "Adding ~/.local/bin to ~/.zshenv (needed for 'zsh -c claude')"
   echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshenv"
+fi
+if ! grep -q '^export LANG=' "$HOME/.zshenv" 2>/dev/null; then
+  log "Adding LANG=en_US.UTF-8 to ~/.zshenv (UTF-8 rendering in the session)"
+  echo 'export LANG=en_US.UTF-8' >> "$HOME/.zshenv"
 fi
 
 # 1. LaunchAgent: keep a `screen` session alive in the GUI login session.
@@ -66,7 +70,7 @@ cat > "$PLIST" <<PLISTEOF
 <plist version="1.0"><dict>
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key>
-  <array><string>/usr/bin/screen</string><string>-D</string><string>-m</string><string>-S</string><string>$SESSION</string><string>/bin/zsh</string></array>
+  <array><string>/usr/bin/screen</string><string>-U</string><string>-D</string><string>-m</string><string>-S</string><string>$SESSION</string><string>/bin/zsh</string></array>
   <key>EnvironmentVariables</key><dict><key>SHELL</key><string>/bin/zsh</string><key>TERM</key><string>xterm-256color</string></dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
