@@ -281,3 +281,53 @@ gh auth login
 
 I personally recommend using a **separate GitHub account**, not your main one, so it
 doesn't mess up your main account.
+
+---
+
+## 11. Computer use over SSH (optional)
+
+This lets an interactive `claude` session on the target both **see** (screenshots) and
+**control** (mouse/keyboard) the target's desktop - driven entirely over SSH.
+
+The obstacle: macOS gates screen capture and input behind **Screen Recording** and
+**Accessibility** permissions that are granted only in the GUI and tied to the GUI login
+session, so a process launched over SSH can't reach the display. The workaround: a
+**LaunchAgent** keeps a `screen` session alive *inside* the GUI session, and `claude`
+runs inside it. Because `claude` is then a child of the granted `screen` binary, computer
+use inherits the permissions and the display. You attach to that session over SSH.
+
+### One-time manual grants (can't be scripted)
+
+On the target (physically or via Screen Sharing), in **System Settings -> Privacy &
+Security**:
+
+1. **Screen Recording** -> **+** -> press **Cmd-Shift-G**, enter `/usr/bin/screen` -> add
+   and toggle **on**.
+2. **Accessibility** -> **+** -> `/usr/bin/screen` -> toggle **on**.
+3. The first time it captures, macOS shows a *"screen wants to bypass the window picker"*
+   prompt - click **Allow**. (This recurs roughly monthly on recent macOS.)
+
+macOS blocks automation from clicking these security prompts, so they must be done by a
+human at the machine.
+
+### Scriptable setup (on the target)
+
+```bash
+./setup-computer-use.sh
+```
+
+This installs the LaunchAgent (`~/Library/LaunchAgents/com.boxclaude.plist`, a persistent
+`screen` session named `cc`) and enables the built-in `computer-use` tool in
+`~/.claude.json` (no `/mcp` menu needed). Requires a **Claude Pro or Max** plan. Re-runnable;
+`./setup-computer-use.sh --uninstall` removes the LaunchAgent and session.
+
+### Use it from your Mac
+
+Add an alias on the **source** Mac (like the clipboard aliases above):
+
+```bash
+alias boxclaude='ssh <user>@<target-host>.local -t "screen -r cc || screen -S cc -X screen claude; screen -r cc"'
+```
+
+Run `boxclaude` to attach to the session and drive `claude` with computer use. Detach with
+**Ctrl-A** then **D** (don't exit - that ends the session until the agent restarts it).
