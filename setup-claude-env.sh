@@ -6,14 +6,14 @@
 #   1. Shell aliases: c, cs, and a claude() wrapper (--fs -> --fork-session)
 #   2. DX plugin from ykdojo/claude-code-tips (installs Xcode Command Line
 #      Tools first if missing, since the plugin marketplace needs git)
-#   3. settings.json: ENABLE_TOOL_SEARCH, DISABLE_AUTOUPDATER
+#   3. settings.json: DISABLE_AUTOUPDATER
 #   4. settings.json: default model claude-opus-4-8
 #   5. settings.json: attribution off (commit/pr/sessionUrl)
 #   6. context-bar status line
-#   7. settings.json: promptSuggestionEnabled false
-#   8. .claude.json: hasAcceptedBypassPermissionsMode true, autoCompactEnabled false
+#   7. .claude.json: hasAcceptedBypassPermissionsMode true
+#   8. .claude.json: autoCompactEnabled false
 #   9. GitHub CLI (gh) into ~/.local/bin (auth separately with 'gh auth login')
-#  10. Playwright MCP (installs Node + real Google Chrome, headed)
+#  10. Playwright MCP (installs Node + Google Chrome, headed)
 #  11. yt-dlp binary + skill
 #
 # Selection:
@@ -41,12 +41,12 @@ warn() { printf '\033[1;33m[skip]\033[0m %s\n' "$*"; }
 LABELS=(
   "Shell aliases (c / cs / --fs)"
   "DX plugin (ykdojo/claude-code-tips)"
-  "Tool search + disable auto-updater"
+  "Disable auto-updater"
   "Default model: Opus 4.8"
   "Attribution off (commit / PR / sessionUrl)"
   "context-bar status line"
-  "Prompt suggestions off"
-  "Bypass + autocompact flags"
+  "Pre-accept bypass-permissions mode"
+  "Disable auto-compact"
   "GitHub CLI (gh)"
   "Playwright MCP (heavy: Node + Chrome)"
   "yt-dlp binary + skill"
@@ -161,14 +161,13 @@ setup_statusline_script() {
 # --- 3-7. settings.json (each key gated on its own item) --------------------
 apply_settings() {
   local obj='{}'
-  [ "${SEL[2]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {env:{DISABLE_AUTOUPDATER:"1",ENABLE_TOOL_SEARCH:"true"}}')
+  [ "${SEL[2]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {env:{DISABLE_AUTOUPDATER:"1"}}')
   [ "${SEL[3]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {model:"claude-opus-4-8"}')
   [ "${SEL[4]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {attribution:{commit:"",pr:"",sessionUrl:false}}')
   if [ "${SEL[5]}" = 1 ]; then
     setup_statusline_script
     obj=$(jq -n --argjson o "$obj" '$o + {statusLine:{type:"command",command:"~/.claude/scripts/context-bar.sh"}}')
   fi
-  [ "${SEL[6]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {promptSuggestionEnabled:false}')
   if [ "$obj" != '{}' ]; then
     log "settings.json (selected keys)"
     [ -f "$SETTINGS" ] || echo '{}' > "$SETTINGS"
@@ -177,13 +176,20 @@ apply_settings() {
   fi
 }
 
-# --- 8. .claude.json flags --------------------------------------------------
-setup_claude_json() {
-  log ".claude.json (hasAcceptedBypassPermissionsMode, autoCompactEnabled)"
+# --- 7. .claude.json: pre-accept bypass-permissions -------------------------
+setup_bypass() {
+  log ".claude.json: hasAcceptedBypassPermissionsMode"
   [ -f "$CLAUDE_JSON" ] || echo '{}' > "$CLAUDE_JSON"
   local tmp; tmp=$(mktemp)
-  jq '. + {hasAcceptedBypassPermissionsMode: true, autoCompactEnabled: false}' \
-    "$CLAUDE_JSON" > "$tmp" && mv "$tmp" "$CLAUDE_JSON"
+  jq '. + {hasAcceptedBypassPermissionsMode: true}' "$CLAUDE_JSON" > "$tmp" && mv "$tmp" "$CLAUDE_JSON"
+}
+
+# --- 8. .claude.json: disable auto-compact ----------------------------------
+setup_autocompact() {
+  log ".claude.json: autoCompactEnabled false"
+  [ -f "$CLAUDE_JSON" ] || echo '{}' > "$CLAUDE_JSON"
+  local tmp; tmp=$(mktemp)
+  jq '. + {autoCompactEnabled: false}' "$CLAUDE_JSON" > "$tmp" && mv "$tmp" "$CLAUDE_JSON"
 }
 
 # --- 9. GitHub CLI ----------------------------------------------------------
@@ -204,9 +210,9 @@ setup_gh() {
   log "gh ${ver} installed - run 'gh auth login' to authenticate"
 }
 
-# --- 10. Playwright MCP (real Google Chrome, headed) ------------------------
+# --- 10. Playwright MCP (Google Chrome, headed) -----------------------------
 setup_playwright() {
-  log "Playwright MCP (installs Node if missing, then real Google Chrome)"
+  log "Playwright MCP (installs Node if missing, then Google Chrome)"
   if ! command -v node >/dev/null; then
     local nv arch tarball
     nv="v22.14.0"
@@ -236,8 +242,9 @@ setup_ytdlp() {
 # --- run the selected items -------------------------------------------------
 [ "${SEL[0]}" = 1 ] && setup_aliases
 if [ "${SEL[1]}" = 1 ]; then ensure_clt; setup_dx_plugin; fi
-apply_settings                                   # items 3-7, internally gated
-[ "${SEL[7]}" = 1 ] && setup_claude_json
+apply_settings                                   # items 3-6, internally gated
+[ "${SEL[6]}" = 1 ] && setup_bypass
+[ "${SEL[7]}" = 1 ] && setup_autocompact
 [ "${SEL[8]}" = 1 ] && setup_gh
 if [ "${SEL[9]}" = 1 ]; then setup_playwright; fi
 [ "${SEL[10]}" = 1 ] && setup_ytdlp

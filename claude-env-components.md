@@ -13,23 +13,23 @@ interactive mode you can toggle any combination.
    [ykdojo/claude-code-tips](https://github.com/ykdojo/claude-code-tips). Installs
    the Xcode Command Line Tools first if missing, since the plugin marketplace
    needs git.
-3. **Tool search + no auto-updater** - `settings.json`: `ENABLE_TOOL_SEARCH=true`,
-   `DISABLE_AUTOUPDATER=1`.
+3. **Disable auto-updater** - `settings.json`: `DISABLE_AUTOUPDATER=1`.
 4. **Default model** - `settings.json`: pins `claude-opus-4-8`.
-5. **Attribution off** - `settings.json`: empties the commit/PR attribution and
-   sets `sessionUrl: false`, so Claude Code doesn't add itself to commits or PRs.
-6. **context-bar status line** - downloads `context-bar.sh` and wires it into
-   `settings.json`.
-7. **Prompt suggestions off** - `settings.json`: `promptSuggestionEnabled: false`.
-8. **Bypass + autocompact flags** - `.claude.json`:
-   `hasAcceptedBypassPermissionsMode: true` (so `cs` skips the warning) and
-   `autoCompactEnabled: false`.
+5. **Attribution off** - `settings.json`: empties the
+   [commit/PR attribution](https://github.com/ykdojo/claude-code-tips#disable-commitpr-attribution)
+   and sets `sessionUrl: false`, so Claude Code doesn't add itself to commits or PRs.
+6. **context-bar [status line](https://github.com/ykdojo/claude-code-tips#tip-0-customize-your-status-line)** -
+   downloads [`context-bar.sh`](https://github.com/ykdojo/claude-code-tips/blob/main/scripts/context-bar.sh)
+   and wires it into `settings.json`.
+7. **Pre-accept bypass-permissions** - `.claude.json`:
+   `hasAcceptedBypassPermissionsMode: true`, so `cs` skips the bypass warning.
+8. **Disable auto-compact** - `.claude.json`: `autoCompactEnabled: false`.
 9. **GitHub CLI (gh)** - installs the `gh` binary into `~/.local/bin` (and the
    Command Line Tools for git). Authenticate separately with `gh auth login`.
 
 ## Opt-in (off by default)
 
-10. **Playwright MCP** - browser automation. Installs Node (if missing) and real
+10. **Playwright MCP** - browser automation. Installs Node (if missing) and
     Google Chrome, then registers the MCP as `playwright-mcp --browser chrome`
     (headed). Enable with `--playwright`.
 11. **yt-dlp** - the `yt-dlp` binary plus a skill, for downloading video/audio
