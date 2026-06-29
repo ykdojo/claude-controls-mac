@@ -263,7 +263,7 @@ The script is idempotent (OK to re-run).
 
 ## 10. Log in to Claude and GitHub
 
-Both logins are interactive, so SSH in with a real terminal (not a one-shot command):
+Both logins are interactive, so SSH in:
 
 ```bash
 ssh <user>@<target-host>.local
