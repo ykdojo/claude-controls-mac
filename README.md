@@ -259,4 +259,4 @@ ssh -t <user>@<target-host>.local './setup-claude-env.sh'
 ssh <user>@<target-host>.local 'bash -s -- --all' < setup-claude-env.sh
 ```
 
-The script is idempotent.
+The script is idempotent (OK to re-run).
