@@ -317,6 +317,12 @@ macOS ignores synthetic clicks on these security prompts (it blocks them at the 
 even for an app with Accessibility), so a human has to click them - in person or via Screen
 Sharing.
 
+Beyond the `screen` grants above, computer use may trigger additional one-time macOS prompts
+for the **`claude` binary itself** the first time it acts - folder access (Downloads, Music,
+...), its own Accessibility grant, and potentially more. (`--dangerously-skip-permissions`
+does not cover these - it only skips Claude Code's own tool prompts, not macOS TCC dialogs.)
+Approve them at the machine as they come up.
+
 ### Scriptable setup
 
 Download [`setup-computer-use.sh`](setup-computer-use.sh) onto the target and run it there:
