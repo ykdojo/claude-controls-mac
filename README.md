@@ -349,6 +349,7 @@ independent conversations at once) and attaches to it. It mirrors `claude`'s own
 ic            # new claude session
 ic -c         # continue the most recent conversation (forwards to: claude -c)
 ic -r         # resume picker (forwards to: claude -r)
+ic sh         # a plain shell on the box, no claude (alias: ic shell)
 ic ls         # list live sessions on the box
 ic a [id]     # attach a running session (alias: ic attach; bare = attach if only one)
 ic kill [id]  # kill a session (alias: ic k); "ic kill all" kills all; bare = the only one

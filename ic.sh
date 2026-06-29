@@ -33,6 +33,7 @@ Usage:
   ic -c              continue the most recent conversation (forwards: claude -c)
   ic -r              resume picker (forwards: claude -r)
   ic <claude flags>  any other args forward to claude
+  ic sh              a plain shell on the box (no claude; alias: ic shell)
   ic ls              list live sessions on the box
   ic a [id]          attach a running session (alias: ic attach)
                        no id + exactly one session -> attaches it
@@ -76,6 +77,15 @@ case "${1:-}" in
     else
       sess="$(norm "$id")"
     fi
+    exec ssh "$BOX" -t "screen -U -x $sess"
+    ;;
+
+  sh|shell)
+    # A plain shell in a fresh GUI-session screen (no claude) - persists and has
+    # GUI access (screencapture etc. work), unlike a plain `ssh` shell.
+    sess="ic-sh-$(date +%H%M%S)-$$"
+    ssh "$BOX" "screen -S $ANCHOR -X screen zsh -c 'screen -U -dmS $sess zsh'; \
+                for _ in \$(seq 25); do screen -ls 2>/dev/null | grep -q $sess && break; sleep 0.2; done"
     exec ssh "$BOX" -t "screen -U -x $sess"
     ;;
 
