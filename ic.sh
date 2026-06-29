@@ -41,7 +41,6 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it)
   ic history         stored conversations: count, location, recent (alias: hist)
-  ic search <term>   search stored conversations for <term>
   ic ls              list live sessions on the box
   ic a [id]          attach a running session (alias: ic attach)
                        no id + exactly one session -> attaches it
@@ -134,29 +133,8 @@ ls -t "$d"/*.jsonl | head -10 | while read -r f; do
   printf "  %.8s  %-12s  %4s msg  %s\n" "$id" "$when" "$msgs" "$prev"
 done
 echo ""
-echo "  open/continue:  ic -r            (resume picker)"
-echo "  search:         ic search <term>"
-RSCRIPT
-    ;;
-
-  search)
-    shift
-    [ $# -gt 0 ] || { echo "usage: ic search <term>"; exit 1; }
-    ssh "$BOX" "bash -s -- $(printf '%q' "$*")" <<'RSCRIPT'
-proj=$(echo "$HOME" | sed 's:/:-:g')
-d="$HOME/.claude/projects/$proj"
-q="$1"
-any=0
-for f in "$d"/*.jsonl; do
-  [ -e "$f" ] || continue
-  c=$(grep -ic -- "$q" "$f" 2>/dev/null || true)
-  [ "${c:-0}" -gt 0 ] || continue
-  id=$(basename "$f" .jsonl)
-  when=$(stat -f '%Sm' -t '%b %d %H:%M' "$f" 2>/dev/null)
-  printf "  %.8s  %-12s  %s matches\n" "$id" "$when" "$c"
-  any=1
-done
-[ "$any" -eq 1 ] || echo "  no matches for: $q"
+echo "  open/continue:  ic -r   (resume picker, has search)"
+echo "  the files are JSONL (one message per line) - grep/jq them directly"
 RSCRIPT
     ;;
 
