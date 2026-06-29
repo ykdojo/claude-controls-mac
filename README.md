@@ -279,6 +279,5 @@ on your main Mac).
 gh auth login
 ```
 
-Use a **separate GitHub account**, not your main one. This box is a full-access
-sandbox, so a dedicated account keeps the agent from being able to touch your real
-account's repos and settings.
+I personally recommend using a **separate GitHub account**, not your main one, so it
+doesn't mess up your main account.
