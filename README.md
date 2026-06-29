@@ -269,12 +269,16 @@ Both logins are interactive, so SSH in with a real terminal (not a one-shot comm
 ssh <user>@<target-host>.local
 ```
 
-Then, on the target:
+Then run `claude` on the target - it drops into the login for your Anthropic (Claude)
+account. Follow the prompts (a browser/device-code flow you can finish from a browser
+on your main Mac).
+
+**GitHub - optional, but highly recommended** so the agent can work with repos:
 
 ```bash
-claude         # drops into the interactive login for your Anthropic (Claude) account
-gh auth login  # sign in to GitHub
+gh auth login
 ```
 
-Follow the prompts in each. Both offer a browser/device-code flow, so you can finish
-the sign-in from a browser on your main Mac - no browser needed on the target.
+Use a **separate GitHub account**, not your main one. This box is a full-access
+sandbox, so a dedicated account keeps the agent from being able to touch your real
+account's repos and settings.
