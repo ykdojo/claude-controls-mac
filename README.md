@@ -352,9 +352,7 @@ All `ic` sessions run with `--dangerously-skip-permissions` (and `ic rc` uses
 
 **Copying text out:** sessions run in tmux, and Terminal.app can't receive the clipboard escape
 sequences (OSC52) that claude emits, so mouse-selecting a snippet won't reliably reach your Mac
-clipboard. Quick workaround: **Cmd-A then Cmd-C** copies the whole visible screen. For precise
-per-selection copy, use **iTerm2** instead of Terminal.app (it supports OSC52, so copy lands on
-your Mac clipboard directly).
+clipboard. Quick workaround: **Cmd-A then Cmd-C** copies the whole visible screen.
 
 ### One-time grants (can't be scripted)
 
