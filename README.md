@@ -356,3 +356,24 @@ A human has to do this at the machine (in person or via Screen Sharing) - macOS 
 clicks on these prompts. On first capture you'll also **Allow** a *"bypass the window picker"*
 prompt (recurs ~monthly). The grants are tied to the `claude` binary, so a claude update that
 moves its path can drop them - just re-grant.
+
+---
+
+## 12. Install a VPN (optional)
+
+I like to run a VPN on the box so its traffic goes out separately from my local IP. I
+personally use **Proton VPN** - it has a free tier and I've been using them for a long
+time - but there are plenty of options.
+
+You can just ask the box's Claude to do it: `ic` in and say "install Proton VPN". It'll
+download and install the app. The parts it **can't** do alone:
+
+- **Credentials.** Signing in is required (even free tiers need an account), and that's
+  yours to enter. Send the password over securely with the `sendclip` command from
+  [section 7](#7-clipboard-sync-over-ssh): copy it on your Mac, run `sendclip`, then paste
+  into the sign-in field on the box.
+- **macOS permission prompts.** The first connect pops a system prompt to allow a VPN /
+  network configuration (and may ask for the Mac password) - approve it at the machine.
+- **Computer use for the GUI.** The app is GUI-only, so driving it relies on
+  [section 11](#11-computer-use-over-ssh-optional) being set up. Once signed in, the agent
+  can connect and switch servers itself.
