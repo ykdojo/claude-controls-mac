@@ -8,14 +8,18 @@
 # session, so a process launched over SSH can't reach the display. This installs
 # a LaunchAgent that keeps a `screen` session ("cc") alive *inside* the GUI
 # session. That `cc` session is an anchor: the `ic` helper (ic.sh) spawns each
-# claude in its own child `screen` session through it, so every claude is a
-# descendant of the granted `screen` binary and inherits the GUI permissions and
-# display. (claude is found on PATH via ~/.zshenv; see step 0 below.)
+# claude in its own child `screen` session through it, so claude runs inside the
+# GUI session and can reach the display. The Screen Recording + Accessibility
+# grants go on the `claude` binary itself (see prerequisites).
+# (claude is found on PATH via ~/.zshenv; see step 0 below.)
 #
 # PREREQUISITES (one-time, manual - macOS blocks scripting these):
-#   System Settings > Privacy & Security:
-#     - Screen Recording -> + -> /usr/bin/screen -> on
-#     - Accessibility    -> + -> /usr/bin/screen -> on
+#   System Settings > Privacy & Security, grant to `claude` (easiest: trigger a
+#   computer-use action once and macOS adds the `claude` entry, then toggle on):
+#     - Screen Recording -> claude -> on
+#     - Accessibility    -> claude -> on
+#   Note: tied to the claude binary, so a claude update that moves its path can
+#   drop the grants - re-grant if computer use breaks after an update.
 #   Plus a Claude Pro/Max plan, with `claude` already logged in.
 #
 # Usage:
@@ -115,9 +119,10 @@ jq --arg p "$HOME" \
 log "Computer use configured."
 echo
 echo "Next:"
-echo "  1. One-time grants (if not done) in System Settings > Privacy & Security:"
-echo "       Screen Recording -> + -> /usr/bin/screen -> on"
-echo "       Accessibility    -> + -> /usr/bin/screen -> on"
+echo "  1. One-time grants (if not done) in System Settings > Privacy & Security,"
+echo "     for the 'claude' entry (trigger a computer-use action once to add it):"
+echo "       Screen Recording -> claude -> on"
+echo "       Accessibility    -> claude -> on"
 echo "  2. On your Mac, install the 'ic' helper and run claude (needs Pro/Max):"
 echo "       curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic && chmod +x ~/.local/bin/ic"
 echo "       export IC_BOX=<user>@<host>.local   # then:  ic   (new)   ic -c   ic ls   ic a <id>"

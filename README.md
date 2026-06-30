@@ -292,55 +292,33 @@ doesn't mess up your main account.
 
 ## 11. Computer use over SSH (optional)
 
-This lets an interactive `claude` session on the target both **see** (screenshots) and
-**control** (mouse/keyboard) the target's desktop - driven entirely over SSH.
+Lets an interactive `claude` session on the target **see** (screenshots) and **control**
+(mouse/keyboard) its own desktop, driven over SSH.
 
-The obstacle: macOS gates screen capture and input behind **Screen Recording** and
-**Accessibility** permissions that are granted only in the GUI and tied to the GUI login
-session, so a process launched over SSH can't reach the display. The workaround: a
-**LaunchAgent** keeps a `screen` session alive *inside* the GUI session, and `claude`
-runs inside it. Because `claude` is then a child of the granted `screen` binary, computer
-use inherits the permissions and the display. You attach to that session over SSH.
+This doesn't work out of the box - SSH and macOS's permission model get in the way, so the
+setup below exists to route around that.
 
-### One-time manual grants (can't be scripted)
-
-On the target (physically or via Screen Sharing), in **System Settings -> Privacy &
-Security**:
-
-1. **Screen Recording** -> **+** -> press **Cmd-Shift-G**, enter `/usr/bin/screen` -> add
-   and toggle **on**.
-2. **Accessibility** -> **+** -> `/usr/bin/screen` -> toggle **on**.
-3. The first time it captures, macOS shows a *"screen wants to bypass the window picker"*
-   prompt - click **Allow**. (This recurs roughly monthly on recent macOS.)
-
-macOS ignores synthetic clicks on these security prompts (it blocks them at the OS level,
-even for an app with Accessibility), so a human has to click them - in person or via Screen
-Sharing.
-
-Beyond the `screen` grants above, computer use may trigger additional one-time macOS prompts
-for the **`claude` binary itself** the first time it acts - folder access (Downloads, Music,
-...), its own Accessibility grant, and potentially more. (`--dangerously-skip-permissions`
-does not cover these - it only skips Claude Code's own tool prompts, not macOS TCC dialogs.)
-Approve them at the machine as they come up.
+**Why it needs a workaround:** macOS gates screen capture and input behind Screen Recording
+and Accessibility permissions that are GUI-only and tied to the GUI login session, so an SSH
+process can't reach the display. Fix: a LaunchAgent keeps a `screen` session alive *inside*
+the GUI session and runs `claude` there, so `claude` can reach the display. You attach over SSH.
 
 ### Scriptable setup
 
-Download [`setup-computer-use.sh`](setup-computer-use.sh) onto the target and run it there:
+Run [`setup-computer-use.sh`](setup-computer-use.sh) on the target:
 
 ```bash
 ssh -t <user>@<target-host>.local \
   'curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/setup-computer-use.sh -o setup-computer-use.sh && bash setup-computer-use.sh'
 ```
 
-This installs the LaunchAgent (`~/Library/LaunchAgents/com.boxclaude.plist`, a persistent
-`screen` session named `cc`) and enables the built-in `computer-use` tool in
-`~/.claude.json` (no `/mcp` menu needed). Requires a **Claude Pro or Max** plan. Re-runnable;
-run `bash setup-computer-use.sh --uninstall` on the target to remove the LaunchAgent and session.
+Installs the LaunchAgent (persistent `screen` session `cc`) and enables the built-in
+`computer-use` tool in `~/.claude.json`. Requires a **Claude Pro or Max** plan. Re-runnable;
+`--uninstall` to remove.
 
 ### Use it from your Mac
 
-Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the **source** Mac and point it at
-the target:
+Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the **source** Mac:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic
@@ -348,22 +326,33 @@ chmod +x ~/.local/bin/ic
 echo 'export IC_BOX="<user>@<target-host>.local"' >> ~/.zshrc   # or edit the default in the script
 ```
 
-Each `ic` invocation spawns its **own** `claude` session on the box (so you can run several
-independent conversations at once) and attaches to it. It mirrors `claude`'s own flags:
+Each `ic` spawns its **own** `claude` session on the box (run several at once) and attaches.
+Flags mirror `claude`:
 
 ```bash
-ic            # new claude session
-ic -c         # continue the most recent conversation (forwards to: claude -c)
-ic -r         # resume picker (forwards to: claude -r)
-ic sh         # a plain shell on the box, no claude (alias: ic shell)
-ic rc         # Remote Control: drive the box from your phone (claude remote-control)
-ic history    # stored conversations: count, location, recent w/ previews (alias: hist)
-ic ls         # list live sessions on the box
-ic a [id]     # attach a running session (alias: ic attach; bare = attach if only one)
-ic kill [id]  # kill a session (alias: ic k); "ic kill all" kills all; bare = the only one
-ic -h         # help
+ic               # new claude session
+ic -c            # continue the most recent conversation (forwards to: claude -c)
+ic -r            # resume picker (forwards to: claude -r)
+ic sh            # a plain shell on the box, no claude (alias: ic shell)
+ic rc            # Remote Control: drive the box from your phone (claude remote-control)
+ic history       # stored conversations: count, location, recent w/ previews (alias: hist)
+ic ls            # list live sessions (state, age, what's running, last msg)
+ic attach <id>   # attach a running session (alias: ic a)
+ic kill <id>     # kill a session (alias: ic k); "ic kill all" kills all
+ic -h            # help
 ```
 
-All `ic` claude sessions run with `--dangerously-skip-permissions` (and `ic rc` spawns
-phone sessions with `--permission-mode bypassPermissions`) - the box is an isolated sandbox
-with nothing sensitive to reach, so prompts are auto-approved.
+All `ic` sessions run with `--dangerously-skip-permissions` (and `ic rc` uses
+`--permission-mode bypassPermissions`) - the box is an isolated sandbox, so prompts are auto-approved.
+
+### One-time grants (can't be scripted)
+
+Screen Recording and Accessibility can only be granted in the GUI. Easiest path: `ic` into the
+box and ask Claude to use computer use (e.g. "take a screenshot"). That triggers macOS's
+permission requests and adds a `claude` entry under **System Settings -> Privacy & Security** -
+toggle **Screen Recording** and **Accessibility** on for it, then restart Claude.
+
+A human has to do this at the machine (in person or via Screen Sharing) - macOS blocks synthetic
+clicks on these prompts. On first capture you'll also **Allow** a *"bypass the window picker"*
+prompt (recurs ~monthly). The grants are tied to the `claude` binary, so a claude update that
+moves its path can drop them - just re-grant.

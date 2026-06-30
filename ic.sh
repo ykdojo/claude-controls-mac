@@ -13,9 +13,8 @@
 #   ic -c              # forwards to: claude -c   (continue)
 #   ic -r              # forwards to: claude -r   (resume picker)
 #   ic <claude flags>  # any other args forward to claude
-#   ic ls              # list live ic-* sessions on the box
-#   ic a [id]          # attach a running session (alias: ic attach)
-#                      #   no id + exactly one session -> attaches it
+#   ic ls              # list live ic-* sessions (state, age, proc, last msg)
+#   ic attach <id>     # attach a running session (alias: ic a)
 #
 # Config: set IC_BOX to <user>@<host> (default below).
 #
@@ -41,25 +40,18 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it)
   ic history         stored conversations: count, location, recent (alias: hist)
-  ic ls              list live sessions on the box
-  ic a [id]          attach a running session (alias: ic attach)
-                       no id + exactly one session -> attaches it
-  ic kill [id]       kill a session (alias: ic k); 'ic kill all' kills all;
-                       no id + exactly one session -> kills it
+  ic ls              list live sessions (state, age, proc, last msg)
+  ic attach <id>     attach a running session (alias: ic a)
+  ic kill <id>       kill a session (alias: ic k); 'ic kill all' kills all
   ic -h | --help     this help
 
 Config: set IC_BOX to <user>@<host> (default: yk2@newmacbook.local).
-Detach from a session with Ctrl-A then D; reattach with: ic a <id>
+Detach from a session with Ctrl-A then D; reattach with: ic attach <id>
 EOF
 }
 
 # Normalize a session id: accept "ic-1234", "1234", and map to full name.
 norm() { case "$1" in ic-*) printf '%s' "$1";; *) printf 'ic-%s' "$1";; esac; }
-
-# List ic-* session names on the box (one per line), wiping dead ones first.
-list_sessions() {
-  ssh "$BOX" 'screen -wipe >/dev/null 2>&1; screen -ls 2>/dev/null | grep -oE "ic-[A-Za-z0-9_-]+"' || true
-}
 
 case "${1:-}" in
   -h|--help|help)
@@ -67,23 +59,60 @@ case "${1:-}" in
     ;;
 
   ls)
-    s="$(list_sessions)"
-    if [ -z "$s" ]; then echo "No live ic sessions."; else echo "$s"; fi
+    # Each live ic-* screen session: attach state, age, what's running (interactive
+    # claude / claude remote-control / a plain shell), and the conversation's last
+    # user message. The screen daemon's claude descendant is matched to its
+    # conversation via ~/.claude/sessions/<pid>.json (records the sessionId), then
+    # to the transcript at ~/.claude/projects/<proj>/<sessionId>.jsonl.
+    ssh "$BOX" 'bash -s' <<'RSCRIPT'
+proj=$(echo "$HOME" | sed 's:/:-:g'); pdir="$HOME/.claude/projects/$proj"; sdir="$HOME/.claude/sessions"
+screen -wipe >/dev/null 2>&1
+out=$(screen -ls 2>/dev/null | grep -E "[0-9]+\.ic-[A-Za-z0-9_-]+")
+[ -z "$out" ] && { echo "No live ic sessions."; exit 0; }
+fmt_age() {
+  e="$1"; [ -z "$e" ] && { echo "?"; return; }; d=0
+  case "$e" in *-*) d=${e%%-*}; e=${e#*-};; esac
+  n=$(printf '%s' "$e" | tr -cd ':' | wc -c | tr -d ' ')
+  if [ "$n" = 2 ]; then h=${e%%:*}; r=${e#*:}; m=${r%:*}; s=${r#*:}; else h=0; m=${e%:*}; s=${e#*:}; fi
+  t=$(( 10#$d*86400 + 10#$h*3600 + 10#$m*60 + 10#$s ))
+  if [ $t -ge 86400 ]; then echo "$((t/86400))d$(((t%86400)/3600))h"
+  elif [ $t -ge 3600 ]; then echo "$((t/3600))h$(((t%3600)/60))m"
+  elif [ $t -ge 60 ]; then echo "$((t/60))m"; else echo "${t}s"; fi
+}
+printf "%-20s %-9s %-7s %-10s %s\n" "SESSION" "STATE" "AGE" "PROC" "CONVERSATION (last msg)"
+printf '%s\n' "$out" | while IFS= read -r line; do
+  entry=$(printf '%s' "$line" | grep -oE "[0-9]+\.ic-[A-Za-z0-9_-]+")
+  spid=${entry%%.*}; name=${entry#*.}
+  state=Detached; printf '%s' "$line" | grep -q "(Attached)" && state=Attached
+  age=$(fmt_age "$(ps -o etime= -p "$spid" 2>/dev/null | tr -d ' ')")
+  # collect the screen daemon's descendants (a few levels)
+  pids=$(pgrep -P "$spid" 2>/dev/null)
+  for p in $pids; do pids="$pids $(pgrep -P "$p" 2>/dev/null)"; done
+  for p in $pids; do pids="$pids $(pgrep -P "$p" 2>/dev/null)"; done
+  proc=shell; cpid=
+  for p in $pids; do case "$(ps -o command= -p "$p" 2>/dev/null)" in *"claude remote-control"*) proc="claude-rc"; break;; esac; done
+  # the real claude pid is the descendant that has a sessions/<pid>.json (the
+  # login/screen wrappers also carry "claude" in their argv, so don't match on that)
+  if [ "$proc" != claude-rc ]; then
+    for p in $pids; do [ -f "$sdir/$p.json" ] && { proc=claude; cpid=$p; break; }; done
+  fi
+  conv=""
+  if [ "$proc" = claude ]; then
+    sid=$(sed -n 's/.*"sessionId":"\([^"]*\)".*/\1/p' "$sdir/$cpid.json")
+    jf="$pdir/$sid.jsonl"
+    [ -f "$jf" ] && conv=$(jq -rs '[.[]|select(.type=="user")|.message.content|if type=="array" then (map(select(.type=="text").text)|join(" ")) else . end|select(.!=null and .!="")]|last // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-46)
+  elif [ "$proc" = claude-rc ]; then conv="(remote-control host)"; fi
+  printf "%-20s %-9s %-7s %-10s %s\n" "$name" "$state" "$age" "$proc" "$conv"
+done
+RSCRIPT
     ;;
 
-  a|attach)
+  attach|a)
     id="${2:-}"
     if [ -z "$id" ]; then
-      s="$(list_sessions)"
-      n="$(printf '%s\n' "$s" | grep -c . || true)"
-      if [ "$n" -eq 0 ]; then echo "No live ic sessions. Start one with: ic"; exit 1; fi
-      if [ "$n" -gt 1 ]; then
-        echo "Multiple sessions - pick one with 'ic a <id>':"; echo "$s"; exit 1
-      fi
-      sess="$s"
-    else
-      sess="$(norm "$id")"
+      echo "Usage: ic attach <id>   (see 'ic ls' for live sessions)"; exit 1
     fi
+    sess="$(norm "$id")"
     exec ssh "$BOX" -t "screen -U -x $sess"
     ;;
 
@@ -153,16 +182,9 @@ RSCRIPT
       exit 0
     fi
     if [ -z "$id" ]; then
-      s="$(list_sessions)"
-      n="$(printf '%s\n' "$s" | grep -c . || true)"
-      if [ "$n" -eq 0 ]; then echo "No live ic sessions."; exit 0; fi
-      if [ "$n" -gt 1 ]; then
-        echo "Multiple sessions - 'ic kill <id>' or 'ic kill all':"; echo "$s"; exit 1
-      fi
-      sess="$s"
-    else
-      sess="$(norm "$id")"
+      echo "Usage: ic kill <id> | all   (see 'ic ls' for live sessions)"; exit 1
     fi
+    sess="$(norm "$id")"
     ssh "$BOX" "screen -S $sess -X quit 2>/dev/null; screen -wipe >/dev/null 2>&1 || true"
     echo "Killed $sess."
     ;;
