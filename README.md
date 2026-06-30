@@ -300,8 +300,13 @@ setup below exists to route around that.
 
 **Why it needs a workaround:** macOS gates screen capture and input behind Screen Recording
 and Accessibility permissions that are GUI-only and tied to the GUI login session, so an SSH
-process can't reach the display. Fix: a LaunchAgent keeps a `screen` session alive *inside*
-the GUI session and runs `claude` there, so `claude` can reach the display. You attach over SSH.
+process can't reach the display. Fix: a LaunchAgent keeps a `tmux` server alive *inside* the
+GUI session on a fixed socket; every `claude` session created there (by `ic`) lands on that
+server and inherits the GUI session, so it can reach the display. You attach over SSH.
+
+(tmux, not screen: macOS's system `screen` is the 2006 4.00.03 build, which can't render
+emoji, and even Homebrew screen 5.x replaces astral-plane emoji like 📁 with a placeholder.
+tmux renders them correctly, and its single-server model is simpler to drive.)
 
 ### Scriptable setup
 
@@ -312,9 +317,9 @@ ssh -t <user>@<target-host>.local \
   'curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/setup-computer-use.sh -o setup-computer-use.sh && bash setup-computer-use.sh'
 ```
 
-Installs the LaunchAgent (persistent `screen` session `cc`) and enables the built-in
-`computer-use` tool in `~/.claude.json`. Requires a **Claude Pro or Max** plan. Re-runnable;
-`--uninstall` to remove.
+Installs the LaunchAgent (persistent `tmux` server with anchor session `cc`) and enables the
+built-in `computer-use` tool in `~/.claude.json`. Requires **tmux** (`brew install tmux`) and a
+**Claude Pro or Max** plan. Re-runnable; `--uninstall` to remove.
 
 ### Use it from your Mac
 
@@ -356,6 +361,23 @@ A human has to do this at the machine (in person or via Screen Sharing) - macOS 
 clicks on these prompts. On first capture you'll also **Allow** a *"bypass the window picker"*
 prompt (recurs ~monthly). The grants are tied to the `claude` binary, so a claude update that
 moves its path can drop them - just re-grant.
+
+**Under the tmux setup, the grants go on `tmux`, not `claude`.** macOS attributes
+capture/control to the *responsible process* in the chain, which here is the `tmux` server
+(claude runs as its child, reparented to launchd). So:
+
+1. Grant **tmux** (`/usr/local/bin/tmux`, or `/opt/homebrew/bin/tmux` on Apple Silicon) under
+   **both** Screen Recording **and** Accessibility - Screen Recording covers screenshots,
+   Accessibility covers mouse/keyboard control. Granting only one leaves the other failing.
+2. **Restart the tmux server after granting** - a running process caches its permission state
+   at launch, so a grant won't take effect until the server restarts:
+   `tmux -S /tmp/cc-tmux.sock kill-server` (the LaunchAgent respawns the anchor within seconds).
+   claude sessions started after the restart pick up the new grant.
+
+To make the entries appear in System Settings in the first place, trigger a computer-use action
+(`ic`, then ask Claude to "take a screenshot") - macOS adds `tmux` to the list (toggled off) so
+you can switch it on. Switching from a previous `screen`-based setup surfaces these prompts
+again because the responsible process changed.
 
 ---
 
