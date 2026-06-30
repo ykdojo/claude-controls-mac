@@ -213,9 +213,9 @@ sendclip() {
               -e 'close access h' >/dev/null 2>&1
     scp -q "$f" "$NEWMAC:/tmp/.sendclip.png" &&
       ssh "$NEWMAC" 'osascript -e "set the clipboard to (read (POSIX file \"/tmp/.sendclip.png\") as «class PNGf»)"'
-    rm -f "$f"; echo "image -> target clipboard"
+    rm -f "$f"; echo "image -> target clipboard (press Ctrl-V in your ic session to attach it to claude)"
   else
-    pbpaste | ssh "$NEWMAC" pbcopy; echo "text -> target clipboard"
+    pbpaste | ssh "$NEWMAC" pbcopy; echo "text -> target clipboard (paste with Cmd-V)"
   fi
 }
 alias getclip='ssh "$NEWMAC" pbpaste | pbcopy'
