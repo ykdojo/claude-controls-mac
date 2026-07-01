@@ -198,13 +198,13 @@ they move the clipboard between machines - encrypted, peer-to-peer, no account, 
 third-party service.
 
 [`clip.sh`](clip.sh) wraps this into one command with two subcommands, and adds **image**
-support on top of `pbcopy`/`pbpaste` (which are text-only). Install it on the **source** Mac
-like `ic` - a script on your PATH, configured by the same `IC_BOX` variable:
+support on top of `pbcopy`/`pbpaste` (which are text-only). Install it as a script on your PATH
+on the **source** Mac, and point it at the target host with `IC_BOX`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/clip.sh -o ~/.local/bin/clip
 chmod +x ~/.local/bin/clip
-export IC_BOX="<user>@<target-host>.local"   # add to ~/.zshrc; shared with ic
+export IC_BOX="<user>@<target-host>.local"   # add to ~/.zshrc
 ```
 
 Usage:
