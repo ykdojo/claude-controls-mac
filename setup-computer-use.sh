@@ -101,7 +101,10 @@ fi
 #    so the always-present `cc` anchor is what keeps it alive between ic sessions.
 log "Installing LaunchAgent ($PLIST)"
 mkdir -p "$HOME/Library/LaunchAgents"
-WRAP="$TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null || $TMUX_BIN -S $SOCK new-session -d -s $SESSION; $TMUX_BIN -S $SOCK set -g prefix C-a; $TMUX_BIN -S $SOCK set -g prefix2 C-b; $TMUX_BIN -S $SOCK set -g status off; while $TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null; do sleep 5; done"
+#    The after-load-buffer hook mirrors tmux buffers into the Mac pasteboard:
+#    claude's /copy runs `tmux load-buffer` (it never calls pbcopy), so without
+#    this the copied text is invisible to `clip get` from the source Mac.
+WRAP="$TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null || $TMUX_BIN -S $SOCK new-session -d -s $SESSION; $TMUX_BIN -S $SOCK set -g prefix C-a; $TMUX_BIN -S $SOCK set -g prefix2 C-b; $TMUX_BIN -S $SOCK set -g status off; $TMUX_BIN -S $SOCK set-hook -g after-load-buffer 'run-shell \"$TMUX_BIN -S $SOCK save-buffer - | pbcopy\"'; while $TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null; do sleep 5; done"
 cat > "$PLIST" <<PLISTEOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
