@@ -364,8 +364,9 @@ to the box and checking on it, agent to agent:
 # find the session (ic ls prints the ids)
 ic ls
 
-# type a prompt into it, then confirm with a second Enter - Claude's input box
-# sometimes treats the first Enter as part of the paste, leaving the prompt unsubmitted
+# type a prompt into it, then confirm with a second Enter - with longer prompts,
+# an Enter sent in the same burst as the text doesn't register as submit and the
+# prompt sits in the input box (short prompts usually submit fine)
 ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock send-keys -t <session> 'Switch to main and pull; PR #4 is merged.' Enter"
 sleep 2
 ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock send-keys -t <session> Enter"
