@@ -103,6 +103,8 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
   elif [ "$proc" = claude-rc ]; then conv="(remote-control host)"; fi
   printf "%-20s %-9s %-7s %-10s %s\n" "$name" "$state" "$age" "$proc" "$conv"
 done
+echo ""
+echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-A then D)"
 RSCRIPT
     ;;
 
