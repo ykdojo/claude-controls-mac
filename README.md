@@ -354,6 +354,30 @@ All `ic` sessions run with `--dangerously-skip-permissions` (and `ic rc` uses
 sequences (OSC52) that claude emits, so mouse-selecting a snippet won't reliably reach your Mac
 clipboard. Quick workaround: **Cmd-A then Cmd-C** copies the whole visible screen.
 
+### Bonus: let your Mac's Claude drive the box's Claude
+
+Because every `ic` session lives on the box's tmux server at a fixed socket, a Claude Code
+session on your **source** Mac can prompt one directly over SSH - useful for delegating work
+to the box and checking on it, agent to agent:
+
+```bash
+# find the session (ic ls prints the ids)
+ic ls
+
+# type a prompt into it, then confirm with a second Enter - Claude's input box
+# sometimes treats the first Enter as part of the paste, leaving the prompt unsubmitted
+ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock send-keys -t <session> 'Switch to main and pull; PR #4 is merged.' Enter"
+sleep 2
+ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock send-keys -t <session> Enter"
+
+# read the reply (re-run / poll until the spinner is gone)
+ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock capture-pane -t <session> -p" | tail -30
+```
+
+Keep prompts single-quote-free (or escape them) since they pass through `send-keys`, and
+check the captured pane before sending - if a human is mid-typing in that session, you'd be
+appending to their prompt.
+
 ### One-time grants (can't be scripted)
 
 Screen Recording and Accessibility can only be granted in the GUI, and a human has to do it at
