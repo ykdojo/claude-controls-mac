@@ -225,7 +225,7 @@ install (matches [safeclaw](https://github.com/ykdojo/safeclaw); bump it as you 
 auto-updater is off, so the box stays on whatever you install):
 
 ```bash
-ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.195'
+ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.201'
 ```
 
 The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the target by
