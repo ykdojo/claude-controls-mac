@@ -13,7 +13,9 @@ interactive mode you can toggle any combination.
    [ykdojo/claude-code-tips](https://github.com/ykdojo/claude-code-tips). Installs
    the Xcode Command Line Tools first if missing, since the plugin marketplace
    needs git.
-3. **Disable auto-updater** - `settings.json`: `DISABLE_AUTOUPDATER=1`.
+3. **Disable auto-updater + prompt suggestions** - `settings.json`:
+   `DISABLE_AUTOUPDATER=1` and `promptSuggestionEnabled: false` (suppresses the
+   speculative next-prompt prefill in the input box).
 4. **Default model** - `settings.json`: pins `claude-opus-4-8`.
 5. **Attribution off** - `settings.json`: empties the
    [commit/PR attribution](https://github.com/ykdojo/claude-code-tips#disable-commitpr-attribution)
