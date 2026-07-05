@@ -105,6 +105,7 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
 done
 echo ""
 echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-A then D)"
+echo "kill:   ic kill <id>     (alias: ic k; 'ic kill all' kills all)"
 RSCRIPT
     ;;
 
