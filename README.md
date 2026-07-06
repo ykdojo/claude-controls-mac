@@ -169,11 +169,12 @@ System Settings -> General -> Sharing, shown as `Local hostname`.
 ipconfig getifaddr en0          # e.g. 192.168.1.80
 ```
 
-The IP comes from DHCP and can change after a reboot or when the lease expires.
+Note that the IP can change after a reboot or after a certain amount of time.
 
 > Throughout the rest of this guide, replace `<user>` with the target account name and
-> `<target-host>` with the hostname from above (so the address is
-> `<user>@<target-host>.local`). You can use an IP in place of `<target-host>.local`.
+> `<target-host>` with the hostname from above, so the address is
+> `<user>@<target-host>.local`. You could also instead use an IP in place of
+> `<target-host>.local`.
 
 ---
 
