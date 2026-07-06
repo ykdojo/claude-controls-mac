@@ -317,7 +317,7 @@ Both logins are interactive, so SSH in:
 ssh <user>@<target-host>.local
 ```
 
-Then run `claude` on the target - it drops into the login for your Anthropic (Claude)
+Then run `claude` on the target - it drops into the login for your Anthropic
 account. Follow the prompts (a browser/device-code flow you can finish from a browser
 on your main Mac).
 
