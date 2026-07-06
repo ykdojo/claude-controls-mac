@@ -278,7 +278,7 @@ ssh <user>@<target-host>.local 'echo '\''export PATH="$HOME/.local/bin:$PATH"'\'
 
 ---
 
-## 9. Set up a Claude Code-friendly environment (optional)
+## 9. Set up an opinionated, Claude Code-friendly environment (optional)
 
 The box works now. This optional step applies a set of opinionated defaults via
 [`setup-claude-env.sh`](setup-claude-env.sh) in this repo - shell aliases, the DX
