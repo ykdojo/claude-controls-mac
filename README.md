@@ -254,7 +254,7 @@ Usage:
 
 - **`clip send`** - this Mac's clipboard → the target (text or image). For an image you can
   paste it straight into a Claude Code session on the target with Ctrl-V.
-- **`clip get`** - the target's clipboard → this Mac (text or image); then Cmd-V to paste.
+- **`clip get`** - the target's clipboard → this Mac (text or image).
 
 ---
 
