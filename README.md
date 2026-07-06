@@ -425,7 +425,7 @@ On first capture you'll also **Allow** a *"bypass the window picker"* prompt (re
 
 **The grants go on `tmux`, not `claude`.** macOS attributes
 capture/control to the *responsible process* in the chain, which here is the `tmux` server
-(claude runs as its child, reparented to launchd). So:
+(claude runs as its child). So:
 
 1. Grant `tmux` (`/usr/local/bin/tmux`, or `/opt/homebrew/bin/tmux` on Apple Silicon) under
    both Screen Recording and Accessibility - Screen Recording covers screenshots,
