@@ -462,4 +462,4 @@ download and install the app. The parts it can't do alone:
   can connect and switch servers itself.
 
 This general flow works not just for a VPN app - it should work for pretty much any
-other app too.
+other application too.
