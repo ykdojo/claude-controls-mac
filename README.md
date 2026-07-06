@@ -466,7 +466,7 @@ other application too.
 
 ---
 
-## 13. Control it from your phone (optional)
+## 13. Control it from your phone
 
 Remote Control lets you drive Claude Code from your phone through the Claude app.
 There are two ways to use it:
