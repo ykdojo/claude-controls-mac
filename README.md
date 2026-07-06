@@ -441,7 +441,7 @@ you can switch it on.
 
 ---
 
-## 12. Install a VPN (optional)
+## 12. Install a VPN, or any other app (optional)
 
 I personally like to run a VPN on the box so its traffic goes out separately from my
 local IP. I use Proton VPN - it has a free option and I've been using them for a long
@@ -460,3 +460,6 @@ download and install the app. The parts it can't do alone:
 - **Computer use for the GUI.** The app is GUI-only, so driving it relies on
   [step 11](#11-computer-use-over-ssh-optional) being set up. Once signed in, the agent
   can connect and switch servers itself.
+
+This general flow works not just for a VPN app - it should work for pretty much any
+other app too.
