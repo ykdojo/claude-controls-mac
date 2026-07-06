@@ -463,3 +463,20 @@ download and install the app. The parts it can't do alone:
 
 This general flow works not just for a VPN app - it should work for pretty much any
 other application too.
+
+---
+
+## 13. Control it from your phone (optional)
+
+Remote Control lets you drive Claude Code from your phone through the Claude app.
+There are two ways to use it:
+
+- Run `/remote-control` (or `/rc` for short) inside an existing session and follow
+  the instructions - you can then drive that same session from your phone, going
+  back and forth between the two.
+- Start a server with `claude remote-control`, which also lets you start brand new
+  sessions from your phone, not just attach to one you already have open.
+
+If you went through [step 11](#11-computer-use-over-ssh-optional), `ic rc` starts
+that server for you in a GUI tmux session, so the sessions you spawn from your phone
+have access to computer use too.
