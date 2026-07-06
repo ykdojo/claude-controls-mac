@@ -59,7 +59,7 @@ instead of a container. The approach here:
 - **Drive it over SSH** from your main Mac on your local network, and control it from
   your phone.
 
-## What you need
+## What you'll need
 
 - A spare Mac (the **target**).
 - Your everyday Mac (the **source**), on the same Wi-Fi.
