@@ -515,8 +515,8 @@ Screen Sharing):
 
 Then enable it in Claude Code on the target: run `/chrome` in a session and select
 "Enabled by default" to have the browser tools in every session, or skip that and
-use `claude --chrome` per session. If the connection doesn't work, try restarting
-Chrome once.
+use `claude --chrome` per session ([`ic --chrome`](#use-it-from-your-mac) from your
+source Mac). If the connection doesn't work, try restarting Chrome once.
 
 > **If your source Mac's Chrome also has the extension** signed into the same
 > account, Claude Code can connect to either browser. It prompts you to pick when
