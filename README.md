@@ -486,3 +486,45 @@ There are two ways to use it:
 If you went through [step 11](#11-computer-use-over-ssh-optional), `ic rc` starts
 that server for you in a way that the sessions you spawn from your phone have access
 to computer use too.
+
+---
+
+## 14. Set up Claude in Chrome (optional)
+
+Computer use from [step 11](#11-computer-use-over-ssh-optional) deliberately won't
+control a browser - browsers get a restricted tier where Claude can see what's on
+screen but can't click or type in it. The
+[Claude in Chrome extension](https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn)
+fills that gap with proper browser control: navigating, clicking, filling forms,
+reading console logs and network requests. And unlike Playwright MCP, it drives
+your regular Chrome profile, so the agent can use any logged-in state you set up
+on the box.
+
+It requires Chrome on the target and a direct Anthropic plan (Pro, Max, Team, or
+Enterprise).
+
+You can ask the box's Claude to install Chrome and open the extension's Chrome Web
+Store page. The parts it can't do alone (do these at the machine, in person or via
+Screen Sharing):
+
+- **Click "Add to Chrome".** Optionally, you can pin the extension to the toolbar
+  by going to `chrome://extensions`.
+- **Log into your Claude account in the extension.** You can send the login info
+  with `clip send` from [step 7](#7-clipboard-sync-over-ssh).
+
+Then enable it in Claude Code on the target: run `/chrome` in a session and select
+"Enabled by default" to have the browser tools in every session, or skip that and
+use `claude --chrome` per session. If the connection doesn't work, try restarting
+Chrome once.
+
+> **If your source Mac's Chrome also has the extension** signed into the same
+> account, Claude Code can connect to either browser. It prompts you to pick when
+> both are connected, but its local-machine detection can be wrong
+> ([#74667](https://github.com/anthropics/claude-code/issues/74667)). To avoid
+> that, you can temporarily uninstall the extension from the source Mac's Chrome -
+> or just quit Chrome on the source while the box is working.
+
+Note that sessions spawned from your phone via
+[step 13](#13-control-it-from-your-phone) don't currently get the browser tools
+([#74671](https://github.com/anthropics/claude-code/issues/74671)) - the
+workaround is to start the session in the terminal and attach with `/rc`.
