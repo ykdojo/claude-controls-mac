@@ -350,10 +350,6 @@ process can't reach the display. Fix: a LaunchAgent keeps a `tmux` server alive 
 GUI session on a fixed socket; every `claude` session created there lands on that
 server and inherits the GUI session, so it can reach the display. You attach over SSH.
 
-(tmux, not screen: macOS's system `screen` is the 2006 4.00.03 build, which can't render
-emoji, and even Homebrew screen 5.x replaces astral-plane emoji like 📁 with a placeholder.
-tmux renders them correctly, and its single-server model is simpler to drive.)
-
 ### Scriptable setup
 
 Run [`setup-computer-use.sh`](setup-computer-use.sh) on the target:
