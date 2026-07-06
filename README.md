@@ -451,7 +451,7 @@ You can just ask the box's Claude to do it if you finished walking through
 [the previous step](#11-computer-use-over-ssh-optional): `ic` in and say "install Proton VPN". It'll
 download and install the app. The parts it can't do alone:
 
-- **Credentials.** Signing in is required (even free tiers need an account), and that's
+- **Credentials.** Signing in is required even for the free tier, and that's
   yours to enter. Send the password over securely with `clip send` from
   [section 7](#7-clipboard-sync-over-ssh): copy it on your Mac, run `clip send`, then paste
   into the sign-in field on the box.
