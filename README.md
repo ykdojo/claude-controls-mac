@@ -236,7 +236,7 @@ defaults -currentHost write com.apple.screensaver idleTime 0
 ## 7. Clipboard sync over SSH
 
 macOS ships `pbcopy` (write clipboard) and `pbpaste` (read clipboard). Piped over SSH,
-they move the clipboard between machines - encrypted, peer-to-peer, no Apple ID or
+they can move the clipboard between machines - encrypted, peer-to-peer, no Apple ID or
 third-party service.
 
 [`clip.sh`](clip.sh) wraps this into one command with two subcommands, and adds image
