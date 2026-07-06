@@ -180,14 +180,14 @@ Throughout the rest of this guide, replace `<user>` with the target account name
 
 ## 5. Set up passwordless SSH from the source Mac
 
-On the **source** Mac, create an SSH key (skip if you already have one):
+On the source Mac, create an SSH key (skip if you already have one):
 
 ```bash
 ssh-keygen -t ed25519
 ```
 
-Install your public key on the target. This asks for the target account's **login
-password** once:
+Install your public key on the target. This asks for the target account's login
+password once:
 
 ```bash
 ssh-copy-id <user>@<target-host>.local
