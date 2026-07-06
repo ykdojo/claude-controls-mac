@@ -439,6 +439,12 @@ To make the entries appear in System Settings in the first place, trigger a comp
 (`ic`, then ask Claude to "take a screenshot") - macOS adds `tmux` to the list (toggled off) so
 you can switch it on.
 
+**Full Disk Access stops the "access data from other apps" prompts.** On newer macOS, tmux
+triggers a separate *"tmux would like to access data from other apps"* prompt for each app
+whose data anything inside it touches. Granting `tmux` **Full Disk Access** (same Privacy &
+Security pane) suppresses these prompts entirely: use the **+** button and add the tmux
+binary (Cmd-Shift-G to type the path). Restart the tmux server afterward, as above.
+
 ---
 
 ## 12. Install a VPN, or any other app (optional)
