@@ -253,9 +253,7 @@ export IC_BOX="<user>@<target-host>.local"   # add to ~/.zshrc
 Usage:
 
 - **`clip send`** - this Mac's clipboard → the target (text or image). For an image you can
-  paste it straight into a Claude Code session on the target with **Ctrl-V** (the target has
-  one shared pasteboard for SSH and GUI sessions, and Claude reads it on paste; the terminal
-  can't carry image bytes through a normal paste).
+  paste it straight into a Claude Code session on the target with Ctrl-V.
 - **`clip get`** - the target's clipboard → this Mac (text or image); then Cmd-V to paste.
 
 ---
