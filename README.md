@@ -359,7 +359,7 @@ ssh -t <user>@<target-host>.local \
   'curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/setup-computer-use.sh -o setup-computer-use.sh && bash setup-computer-use.sh'
 ```
 
-Installs the LaunchAgent (persistent `tmux` server with anchor session `cc`) and enables the
+This installs the LaunchAgent (persistent `tmux` server with anchor session `cc`) and enables the
 built-in `computer-use` tool in `~/.claude.json`. Requires tmux (`brew install tmux`) and a
 Claude Pro or Max plan. Re-runnable; `--uninstall` to remove.
 
