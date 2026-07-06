@@ -143,8 +143,8 @@ silently if passwordless sudo works.
 
 ## 4. Find the target's address (hostname or IP)
 
-You can reach the target by either a hostname or an IP. Use the hostname: it stays
-the same, while the IP can change.
+You can reach the target by either a hostname or an IP. I recommend using the
+hostname: it stays the same, while the IP can change.
 
 **Hostname (recommended).** Run on the target:
 
