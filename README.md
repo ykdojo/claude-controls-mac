@@ -380,6 +380,7 @@ Flags mirror `claude`, and it adds several more subcommands:
 ic               # new claude session
 ic -c            # continue the most recent conversation (forwards to: claude -c)
 ic -r            # resume picker (forwards to: claude -r)
+ic --chrome      # with Claude in Chrome (forwards to: claude --chrome)
 ic sh            # a plain shell on the box, no claude (alias: ic shell)
 ic rc            # Remote Control: drive the box from your phone (claude remote-control)
 ic history       # stored conversations: count, location, recent w/ previews (alias: hist)
@@ -514,8 +515,8 @@ Screen Sharing):
 
 Then enable it in Claude Code on the target: run `/chrome` in a session and select
 "Enabled by default" to have the browser tools in every session, or skip that and
-use `claude --chrome` per session. If the connection doesn't work, try restarting
-Chrome once.
+use `claude --chrome` per session ([`ic --chrome`](#use-it-from-your-mac) from your
+source Mac). If the connection doesn't work, try restarting Chrome once.
 
 > **If your source Mac's Chrome also has the extension** signed into the same
 > account, Claude Code can connect to either browser. It prompts you to pick when
