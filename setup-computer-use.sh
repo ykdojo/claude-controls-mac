@@ -159,5 +159,5 @@ echo "     for the 'claude' entry (trigger a computer-use action once to add it)
 echo "       Screen Recording -> claude -> on"
 echo "       Accessibility    -> claude -> on"
 echo "  2. On your Mac, install the 'ic' helper and run claude (needs Pro/Max):"
-echo "       curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic && chmod +x ~/.local/bin/ic"
+echo "       curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/ic.sh -o ~/.local/bin/ic && chmod +x ~/.local/bin/ic"
 echo "       export IC_BOX=<user>@<host>.local   # then:  ic   (new)   ic -c   ic ls   ic a <id>"

@@ -203,7 +203,7 @@ support on top of `pbcopy`/`pbpaste` (which are text-only). Install it as a scri
 on the **source** Mac, and point it at the target host with `IC_BOX`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/clip.sh -o ~/.local/bin/clip
+curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/clip.sh -o ~/.local/bin/clip
 chmod +x ~/.local/bin/clip
 export IC_BOX="<user>@<target-host>.local"   # add to ~/.zshrc
 ```
@@ -253,7 +253,7 @@ script onto the target and run it:
 
 ```bash
 ssh -t <user>@<target-host>.local \
-  'curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/setup-claude-env.sh -o setup-claude-env.sh && bash setup-claude-env.sh'
+  'curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/setup-claude-env.sh -o setup-claude-env.sh && bash setup-claude-env.sh'
 ```
 
 **Non-interactively** - no prompt; core only, or add flags (`--yt-dlp`,
@@ -261,7 +261,7 @@ ssh -t <user>@<target-host>.local \
 
 ```bash
 ssh <user>@<target-host>.local \
-  'curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/setup-claude-env.sh -o setup-claude-env.sh && bash setup-claude-env.sh --all'
+  'curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/setup-claude-env.sh -o setup-claude-env.sh && bash setup-claude-env.sh --all'
 ```
 
 The script is idempotent (OK to re-run).
@@ -315,7 +315,7 @@ Run [`setup-computer-use.sh`](setup-computer-use.sh) on the target:
 
 ```bash
 ssh -t <user>@<target-host>.local \
-  'curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/setup-computer-use.sh -o setup-computer-use.sh && bash setup-computer-use.sh'
+  'curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/setup-computer-use.sh -o setup-computer-use.sh && bash setup-computer-use.sh'
 ```
 
 Installs the LaunchAgent (persistent `tmux` server with anchor session `cc`) and enables the
@@ -327,7 +327,7 @@ built-in `computer-use` tool in `~/.claude.json`. Requires **tmux** (`brew insta
 Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the **source** Mac:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ykdojo/mac-claude-setup/main/ic.sh -o ~/.local/bin/ic
+curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/ic.sh -o ~/.local/bin/ic
 chmod +x ~/.local/bin/ic
 echo 'export IC_BOX="<user>@<target-host>.local"' >> ~/.zshrc   # or edit the default in the script
 ```
