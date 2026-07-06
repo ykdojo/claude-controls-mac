@@ -203,7 +203,7 @@ ssh <user>@<target-host>.local whoami
 
 ## 6. Keep the target awake
 
-By default macOS sleeps after ~10 minutes idle, **even when plugged in**, which takes
+By default macOS sleeps after ~10 minutes idle, even when plugged in, which takes
 it off the network. To make it never sleep, run this on the target (or over SSH from
 the source):
 
@@ -224,7 +224,7 @@ pmset -g | grep -iE 'sleep'
 If the machine runs on battery sometimes, use `-a` instead of `-c` to apply to all
 power sources (at the cost of battery drain).
 
-The screen can still **lock** when the screen saver kicks in. Stop the screen saver
+The screen can still lock when the screen saver kicks in. Stop the screen saver
 from ever starting so it never locks on its own:
 
 ```bash
@@ -239,9 +239,9 @@ macOS ships `pbcopy` (write clipboard) and `pbpaste` (read clipboard). Piped ove
 they move the clipboard between machines - encrypted, peer-to-peer, no account, no
 third-party service.
 
-[`clip.sh`](clip.sh) wraps this into one command with two subcommands, and adds **image**
+[`clip.sh`](clip.sh) wraps this into one command with two subcommands, and adds image
 support on top of `pbcopy`/`pbpaste` (which are text-only). Install it as a script on your PATH
-on the **source** Mac, and point it at the target host with `IC_BOX`:
+on the source Mac, and point it at the target host with `IC_BOX`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/clip.sh -o ~/.local/bin/clip
@@ -271,7 +271,7 @@ ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -
 ```
 
 The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the target by
-adding it to **`~/.zshenv`** (not `~/.zshrc`) - `.zshenv` is read by *every* zsh, including
+adding it to `~/.zshenv` (not `~/.zshrc`) - `.zshenv` is read by *every* zsh, including
 non-interactive ones, so `claude` is also found by `zsh -c ...` (which step 11 relies on):
 
 ```bash
@@ -327,14 +327,14 @@ on your main Mac).
 gh auth login
 ```
 
-I personally recommend using a **separate GitHub account**, not your main one, so it
+I personally recommend using a separate GitHub account, not your main one, so it
 doesn't mess up your main account.
 
 ---
 
 ## 11. Computer use over SSH (optional)
 
-Lets an interactive `claude` session on the target **see** (screenshots) and **control**
+Lets an interactive `claude` session on the target see (screenshots) and control
 (mouse/keyboard) its own desktop, driven over SSH.
 
 This doesn't work out of the box - SSH and macOS's permission model get in the way, so the
@@ -360,12 +360,12 @@ ssh -t <user>@<target-host>.local \
 ```
 
 Installs the LaunchAgent (persistent `tmux` server with anchor session `cc`) and enables the
-built-in `computer-use` tool in `~/.claude.json`. Requires **tmux** (`brew install tmux`) and a
-**Claude Pro or Max** plan. Re-runnable; `--uninstall` to remove.
+built-in `computer-use` tool in `~/.claude.json`. Requires tmux (`brew install tmux`) and a
+Claude Pro or Max plan. Re-runnable; `--uninstall` to remove.
 
 ### Use it from your Mac
 
-Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the **source** Mac:
+Install [`ic.sh`](ic.sh) (`ic` = "isolated claude") on the source Mac:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/ic.sh -o ~/.local/bin/ic
@@ -373,7 +373,7 @@ chmod +x ~/.local/bin/ic
 echo 'export IC_BOX="<user>@<target-host>.local"' >> ~/.zshrc   # or edit the default in the script
 ```
 
-Each `ic` spawns its **own** `claude` session on the box (run several at once) and attaches.
+Each `ic` spawns its own `claude` session on the box (run several at once) and attaches.
 Flags mirror `claude`:
 
 ```bash
@@ -399,7 +399,7 @@ clipboard. Quick workaround: **Cmd-A then Cmd-C** copies the whole visible scree
 ### Bonus: let your Mac's Claude drive the box's Claude
 
 Because every `ic` session lives on the box's tmux server at a fixed socket, a Claude Code
-session on your **source** Mac can prompt one directly over SSH - useful for delegating work
+session on your source Mac can prompt one directly over SSH - useful for delegating work
 to the box and checking on it, agent to agent:
 
 ```bash
@@ -431,8 +431,8 @@ On first capture you'll also **Allow** a *"bypass the window picker"* prompt (re
 capture/control to the *responsible process* in the chain, which here is the `tmux` server
 (claude runs as its child, reparented to launchd). So:
 
-1. Grant **tmux** (`/usr/local/bin/tmux`, or `/opt/homebrew/bin/tmux` on Apple Silicon) under
-   **both** Screen Recording **and** Accessibility - Screen Recording covers screenshots,
+1. Grant `tmux` (`/usr/local/bin/tmux`, or `/opt/homebrew/bin/tmux` on Apple Silicon) under
+   both Screen Recording and Accessibility - Screen Recording covers screenshots,
    Accessibility covers mouse/keyboard control. Granting only one leaves the other failing.
 2. **Restart the tmux server after granting** - a running process caches its permission state
    at launch, so a grant won't take effect until the server restarts:
@@ -444,7 +444,7 @@ To make the entries appear in System Settings in the first place, trigger a comp
 you can switch it on. Switching from a previous `screen`-based setup surfaces these prompts
 again because the responsible process changed.
 
-The `claude` binary does **not** need its own grant (verified: with `claude` toggled off and
+The `claude` binary does not need its own grant (verified: with `claude` toggled off and
 only `tmux` on, computer use still works). A bonus over the old screen setup: because the grant
 is tied to `tmux`, a `claude` auto-update - which moves its versioned binary path - no longer
 drops computer-use access. Only a `tmux` upgrade would, which is rare.
@@ -454,11 +454,11 @@ drops computer-use access. Only a `tmux` upgrade would, which is rare.
 ## 12. Install a VPN (optional)
 
 I like to run a VPN on the box so its traffic goes out separately from my local IP. I
-personally use **Proton VPN** - it has a free tier and I've been using them for a long
+personally use Proton VPN - it has a free tier and I've been using them for a long
 time - but there are plenty of options.
 
 You can just ask the box's Claude to do it: `ic` in and say "install Proton VPN". It'll
-download and install the app. The parts it **can't** do alone:
+download and install the app. The parts it can't do alone:
 
 - **Credentials.** Signing in is required (even free tiers need an account), and that's
   yours to enter. Send the password over securely with `clip send` from
