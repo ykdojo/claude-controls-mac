@@ -321,7 +321,9 @@ Then run `claude` on the target - it drops into the login for your Anthropic (Cl
 account. Follow the prompts (a browser/device-code flow you can finish from a browser
 on your main Mac).
 
-**GitHub - optional, but highly recommended** so the agent can work with repos:
+**GitHub - optional, but highly recommended** so the agent can work with repos. If
+you haven't installed the GitHub CLI yet, you can do so from the previous step. Then
+run:
 
 ```bash
 gh auth login
