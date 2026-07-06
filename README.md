@@ -270,7 +270,7 @@ ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -
 
 The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the target by
 adding it to `~/.zshenv` (not `~/.zshrc`) - `.zshenv` is read by *every* zsh, including
-non-interactive ones, so `claude` is also found by `zsh -c ...` (which step 11 relies on):
+non-interactive ones:
 
 ```bash
 ssh <user>@<target-host>.local 'echo '\''export PATH="$HOME/.local/bin:$PATH"'\'' >> ~/.zshenv'
