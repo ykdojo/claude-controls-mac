@@ -478,5 +478,5 @@ There are two ways to use it:
   sessions from your phone, not just attach to one you already have open.
 
 If you went through [step 11](#11-computer-use-over-ssh-optional), `ic rc` starts
-that server for you in a GUI tmux session, so the sessions you spawn from your phone
-have access to computer use too.
+that server for you in a way that the sessions you spawn from your phone have access
+to computer use too.
