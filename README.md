@@ -345,7 +345,7 @@ This doesn't work out of the box - SSH and macOS's permission model get in the w
 setup below exists to route around that.
 
 **Why it needs a workaround:** macOS gates screen capture and input behind Screen Recording
-and Accessibility permissions that are GUI-only and tied to the GUI login session, so an SSH
+and Accessibility permissions that are tied to the GUI login session, so an SSH
 process can't reach the display. Fix: a LaunchAgent keeps a `tmux` server alive *inside* the
 GUI session on a fixed socket; every `claude` session created there lands on that
 server and inherits the GUI session, so it can reach the display. You attach over SSH.
