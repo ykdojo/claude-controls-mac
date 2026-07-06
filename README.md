@@ -136,7 +136,8 @@ password prompt:
 - **line 3** validates the syntax; a typo in a sudoers file can lock you out of `sudo`
   entirely, so it must print `parsed OK`.
 
-After this, `sudo` runs with no prompt (test with `sudo -n true`).
+After this, `sudo` runs with no prompt - test with `sudo -n true`, which succeeds
+silently if passwordless sudo works and errors instead of prompting if it doesn't.
 
 ---
 
