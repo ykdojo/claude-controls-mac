@@ -41,7 +41,8 @@ Usage:
   ic <claude flags>  any other args forward to claude
   ic sh              a plain shell on the box (no claude; alias: ic shell)
   ic rc              Remote Control: drive the box from your phone
-                       (runs claude remote-control; extra args forward to it)
+                       (runs claude remote-control; extra args forward to it;
+                        alias: ic remote-control)
   ic history         stored conversations: count, location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
@@ -125,7 +126,7 @@ RSCRIPT
     exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess zsh"
     ;;
 
-  rc)
+  rc|remote-control)
     # Remote Control: drive the box's claude from your phone (claude.ai/code or
     # the mobile app). Runs in a GUI-session tmux session so it can read the login
     # token (the Keychain is only reachable inside the GUI session). Extra args
