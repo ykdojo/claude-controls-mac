@@ -262,7 +262,7 @@ Usage:
 
 Send the install command over and run it. From the source Mac you can push it straight
 to the target's clipboard, or run it remotely. The following command installs a
-specific version, but you can also install `latest` or `stable`:
+specific version, but you can also install `latest` or `stable` if you'd like:
 
 ```bash
 ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.201'
