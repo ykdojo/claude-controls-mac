@@ -444,7 +444,7 @@ you can switch it on.
 ## 12. Install a VPN (optional)
 
 I personally like to run a VPN on the box so its traffic goes out separately from my
-local IP. I use Proton VPN - it has a free tier and I've been using them for a long
+local IP. I use Proton VPN - it has a free option and I've been using them for a long
 time - but of course there are other options.
 
 You can just ask the box's Claude to do it if you finished walking through
