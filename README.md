@@ -453,10 +453,10 @@ download and install the app. The parts it can't do alone:
 
 - **Credentials.** Signing in is required even for the free tier, and that's
   yours to enter. Send the password over securely with `clip send` from
-  [section 7](#7-clipboard-sync-over-ssh): copy it on your Mac, run `clip send`, then paste
+  [step 7](#7-clipboard-sync-over-ssh): copy it on your Mac, run `clip send`, then paste
   into the sign-in field on the box.
 - **macOS permission prompts.** The first connect pops a system prompt to allow a VPN /
   network configuration (and may ask for the Mac password) - approve it at the machine.
 - **Computer use for the GUI.** The app is GUI-only, so driving it relies on
-  [section 11](#11-computer-use-over-ssh-optional) being set up. Once signed in, the agent
+  [step 11](#11-computer-use-over-ssh-optional) being set up. Once signed in, the agent
   can connect and switch servers itself.
