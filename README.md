@@ -281,7 +281,7 @@ ssh <user>@<target-host>.local 'echo '\''export PATH="$HOME/.local/bin:$PATH"'\'
 ## 9. Set up an opinionated, Claude Code-friendly environment (optional)
 
 This optional step applies a set of opinionated defaults via
-[`setup-claude-env.sh`](setup-claude-env.sh) in this repo - shell aliases, the DX
+[`setup-claude-env.sh`](setup-claude-env.sh) - shell aliases, the DX
 plugin, `settings.json` tweaks, the GitHub CLI, and (opt-in) Playwright MCP and
 yt-dlp. Every item is toggleable; see the full list in
 [`claude-env-components.md`](claude-env-components.md).
