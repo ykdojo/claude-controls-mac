@@ -24,7 +24,7 @@ The following guide assumes you have your main Mac as well as a spare Mac you ca
 up for this, but you should be able to take inspiration from it and apply it to any
 combination of two machines.
 
-## Why this setup
+## Why this setup?
 
 Running an agent with broad permissions is safer on a machine that has nothing to lose.
 The approach here:
@@ -37,6 +37,23 @@ The approach here:
 
 The result is an isolated sandbox you can give full access to, while still being able
 to control it from your main machine.
+
+### Why not run it in a container?
+
+I've actually built an entire environment for running Claude Code conveniently in a
+container: [safeclaw](https://github.com/ykdojo/safeclaw). However, I found it has a
+few limitations. First, it still runs on your main machine, so it's not completely
+separated. Second, I wanted my agent to be able to run Unity specifically for game
+development, and I don't think there's an easy way to do that within a container. I'm
+planning to keep maintaining that repo, but I've decided to set this up separately as
+well.
+
+### Why not something like OpenClaw?
+
+I personally like having access to the full, latest features of Claude Code. I also
+like being able to control it from the Claude app - I've found it really convenient.
+And you get to use your Claude subscription usage if you happen to have one, which is
+an added bonus.
 
 ## What you need
 
