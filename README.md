@@ -241,8 +241,8 @@ third-party service.
 
 [`clip.sh`](clip.sh) wraps this into one command with two subcommands, and adds image
 support on top of `pbcopy`/`pbpaste` (which are text-only). Install it as a script on your PATH
-on the source Mac, and point it at the target host with `IC_BOX` ("ic" stands for
-"isolated claude" - you'll meet the `ic` helper itself later in the guide):
+on the source Mac, and point it at the target host with `IC_BOX` ("ic" standing for
+"isolated claude"):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/clip.sh -o ~/.local/bin/clip
