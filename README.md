@@ -30,13 +30,18 @@ First, let me quickly address a few questions you might have.
 
 ### Why not run it in a container?
 
-I've actually built an entire environment for running Claude Code conveniently in a
-container: [safeclaw](https://github.com/ykdojo/safeclaw). However, I found it has a
-few limitations. First, it still runs on your main machine, so it's not completely
-separated. Second, I wanted my agent to be able to run Unity specifically for game
-development, and I don't think there's an easy way to do that within a container. I'm
-planning to keep maintaining that repo, but I've decided to set this up separately as
-well.
+I'm a big proponent of running it in a container - I even built
+[an entire environment for running it conveniently](https://github.com/ykdojo/safeclaw).
+However, I've found it has a few limitations.
+
+First, it still runs on your main machine, so it's not completely separated. For
+example, network requests it sends still go through your main machine.
+
+Second, there are limitations to the container's capabilities. For example, I wanted
+my agent to be able to run Unity for game development, and there's no easy way to do
+that in a container. The same goes for any other app that's only available on a Mac -
+you won't have access to it. That especially matters if you want Claude Code to
+control these apps through computer use - clicking, dragging, and so on.
 
 ### Why not something like OpenClaw?
 
