@@ -417,10 +417,6 @@ ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock send-keys -t <session>
 ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock capture-pane -t <session> -p" | tail -30
 ```
 
-Keep prompts single-quote-free (or escape them) since they pass through `send-keys`, and
-check the captured pane before sending - if a human is mid-typing in that session, you'd be
-appending to their prompt.
-
 ### One-time grants (can't be scripted)
 
 Screen Recording and Accessibility can only be granted in the GUI, and a human has to do it at
