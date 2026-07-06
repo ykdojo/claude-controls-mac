@@ -39,7 +39,7 @@ example, network requests it sends still go through your main machine.
 Second, there are limitations to the container's capabilities. For example, I wanted
 my agent to be able to run Unity for game development, and there's no easy way to do
 that in a container. The same goes for any other app that's only available on a Mac -
-you won't have access to it. That especially matters if you want Claude Code to
+you won't have access to it. That's especially relevant if you want Claude Code to
 control these apps through computer use - clicking, dragging, and so on.
 
 ### Why not use something like OpenClaw?
