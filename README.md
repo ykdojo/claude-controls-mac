@@ -42,7 +42,7 @@ that in a container. The same goes for any other app that's only available on a 
 you won't have access to it. That especially matters if you want Claude Code to
 control these apps through computer use - clicking, dragging, and so on.
 
-### Why not something like OpenClaw?
+### Why not use something like OpenClaw?
 
 I personally like having access to the full, latest features of Claude Code. I also
 like being able to control it from the Claude app - I've found it really convenient.
