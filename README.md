@@ -447,7 +447,8 @@ I personally like to run a VPN on the box so its traffic goes out separately fro
 local IP. I use Proton VPN - it has a free tier and I've been using them for a long
 time - but of course there are other options.
 
-You can just ask the box's Claude to do it: `ic` in and say "install Proton VPN". It'll
+You can just ask the box's Claude to do it if you finished walking through
+[the previous step](#11-computer-use-over-ssh-optional): `ic` in and say "install Proton VPN". It'll
 download and install the app. The parts it can't do alone:
 
 - **Credentials.** Signing in is required (even free tiers need an account), and that's
