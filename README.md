@@ -89,8 +89,7 @@ Software Update).
 
 ### Make the account an admin (if you haven't already)
 
-The account needs admin rights or `sudo` will refuse to run (`<user> is not in the
-sudoers file. This incident has been reported to the administrator.`).
+The account needs admin rights or `sudo` will refuse to run.
 
 - System Settings -> Users & Groups -> set the account to **Allow this user to
   administer this computer**.
