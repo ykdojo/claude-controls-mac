@@ -26,6 +26,8 @@ combination of two machines.
 
 ## Why this setup?
 
+First, let me quickly address a few questions you might have.
+
 ### Why not run it in a container?
 
 I've actually built an entire environment for running Claude Code conveniently in a
