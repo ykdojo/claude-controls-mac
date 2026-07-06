@@ -295,8 +295,10 @@ ssh -t <user>@<target-host>.local \
   'curl -fsSL https://raw.githubusercontent.com/ykdojo/claude-controls-mac/main/setup-claude-env.sh -o setup-claude-env.sh && bash setup-claude-env.sh'
 ```
 
-**Non-interactively** - no prompt; installs core only by default, or pick what you
-want with flags (`--yt-dlp`, `--playwright`, `--all`, `--core`):
+**Non-interactively** - the script goes into this mode if it detects a
+non-interactive environment or you supply at least one flag. No prompt; installs
+core only by default, or pick what you want with flags (`--yt-dlp`, `--playwright`,
+`--all`, `--core`):
 
 ```bash
 ssh <user>@<target-host>.local \
