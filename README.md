@@ -15,6 +15,11 @@ carries some risk when run on your main machine. You can eliminate / mitigate th
 risks by creating a separate environment on your spare Mac with everything it needs
 to have access to.
 
+It has an added bonus of being able to talk to Claude Code anytime, anywhere from
+your phone. I've personally found it really useful because I often prefer to talk to
+Claude Code instead of regular Claude on the mobile app - Claude Code is often more
+capable.
+
 The following guide assumes you have your main Mac as well as a spare Mac you can set
 up for this, but you should be able to take inspiration from it and apply it to any
 combination of two machines.
