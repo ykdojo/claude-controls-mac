@@ -146,7 +146,7 @@ silently if passwordless sudo works.
 You can reach the target by either a hostname or an IP. Use the hostname: it stays
 the same, while the IP can change.
 
-Hostname (recommended). Run on the target:
+**Hostname (recommended).** Run on the target:
 
 ```bash
 scutil --get LocalHostName      # prints the hostname, e.g. MacBook-Pro
@@ -163,7 +163,7 @@ System Settings -> General -> Sharing, shown as `Local hostname`.
 > sudo scutil --set LocalHostName newmacbook   # -> newmacbook.local
 > ```
 
-IP address (not recommended). Run on the target:
+**IP address (not recommended).** Run on the target:
 
 ```bash
 ipconfig getifaddr en0          # e.g. 192.168.1.80
