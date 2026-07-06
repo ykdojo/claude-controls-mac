@@ -187,7 +187,7 @@ ssh-keygen -t ed25519
 ```
 
 Install your public key on the target. This asks for the target account's **login
-password** once - not your Apple ID, not the source Mac's password:
+password** once:
 
 ```bash
 ssh-copy-id <user>@<target-host>.local
