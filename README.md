@@ -1,7 +1,8 @@
 # How to set up your spare Mac for Claude Code to fully control - a step-by-step guide
 
-How to turn a spare Mac into a remote, full-access machine for running Claude Code,
-controlled over SSH from your main Mac - with secure clipboard sync between the two.
+Here's a full step-by-step guide on how to turn your spare Mac into an always-on
+machine Claude Code can fully control, with computer use enabled. You'll be able to talk to it from your phone
+through the Claude app, or from your main Mac over SSH.
 
 ## Why this setup
 
