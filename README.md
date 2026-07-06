@@ -429,7 +429,7 @@ capture/control to the *responsible process* in the chain, which here is the `tm
 
 1. Grant `tmux` (`/usr/local/bin/tmux`, or `/opt/homebrew/bin/tmux` on Apple Silicon) under
    both Screen Recording and Accessibility - Screen Recording covers screenshots,
-   Accessibility covers mouse/keyboard control. Granting only one leaves the other failing.
+   Accessibility covers mouse/keyboard control.
 2. **Restart the tmux server after granting** - a running process caches its permission state
    at launch, so a grant won't take effect until the server restarts:
    `tmux -S /tmp/cc-tmux.sock kill-server` (the LaunchAgent respawns the anchor within seconds).
