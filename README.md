@@ -137,7 +137,7 @@ password prompt:
   entirely, so it must print `parsed OK`.
 
 After this, `sudo` runs with no prompt - test with `sudo -n true`, which succeeds
-silently if passwordless sudo works and errors instead of prompting if it doesn't.
+silently if passwordless sudo works.
 
 ---
 
