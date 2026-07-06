@@ -338,7 +338,7 @@ doesn't mess up your main account.
 
 ## 11. Computer use over SSH (optional)
 
-Lets an interactive `claude` session on the target see (screenshots) and control
+This lets an interactive `claude` session on the target see (screenshots) and control
 (mouse/keyboard) its own desktop, driven over SSH.
 
 This doesn't work out of the box - SSH and macOS's permission model get in the way, so the
