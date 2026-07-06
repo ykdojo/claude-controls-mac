@@ -171,10 +171,10 @@ ipconfig getifaddr en0          # e.g. 192.168.1.80
 
 Note that the IP can change after a reboot or after a certain amount of time.
 
-> Throughout the rest of this guide, replace `<user>` with the target account name and
-> `<target-host>` with the hostname from above, so the address is
-> `<user>@<target-host>.local`. You could also instead use an IP in place of
-> `<target-host>.local`.
+Throughout the rest of this guide, replace `<user>` with the target account name and
+`<target-host>` with the hostname from above, so the address is
+`<user>@<target-host>.local`. You could also instead use an IP in place of
+`<target-host>.local`.
 
 ---
 
