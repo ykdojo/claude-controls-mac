@@ -443,9 +443,9 @@ you can switch it on.
 
 ## 12. Install a VPN (optional)
 
-I like to run a VPN on the box so its traffic goes out separately from my local IP. I
-personally use Proton VPN - it has a free tier and I've been using them for a long
-time - but there are plenty of options.
+I personally like to run a VPN on the box so its traffic goes out separately from my
+local IP. I use Proton VPN - it has a free tier and I've been using them for a long
+time - but of course there are other options.
 
 You can just ask the box's Claude to do it: `ic` in and say "install Proton VPN". It'll
 download and install the app. The parts it can't do alone:
