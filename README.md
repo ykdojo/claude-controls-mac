@@ -437,13 +437,12 @@ capture/control to the *responsible process* in the chain, which here is the `tm
 
 To make the entries appear in System Settings in the first place, trigger a computer-use action
 (`ic`, then ask Claude to "take a screenshot") - macOS adds `tmux` to the list (toggled off) so
-you can switch it on. Switching from a previous `screen`-based setup surfaces these prompts
-again because the responsible process changed.
+you can switch it on.
 
 The `claude` binary does not need its own grant (verified: with `claude` toggled off and
-only `tmux` on, computer use still works). A bonus over the old screen setup: because the grant
-is tied to `tmux`, a `claude` auto-update - which moves its versioned binary path - no longer
-drops computer-use access. Only a `tmux` upgrade would, which is rare.
+only `tmux` on, computer use still works). A bonus: because the grant
+is tied to `tmux`, a `claude` auto-update - which moves its versioned binary path - doesn't
+drop computer-use access. Only a `tmux` upgrade would, which is rare.
 
 ---
 
