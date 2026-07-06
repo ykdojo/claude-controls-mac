@@ -56,7 +56,7 @@ instead of a container. The approach here:
 - **Use an old/spare Mac**, not your main one.
 - **Create a fresh local account with no personal data and no Apple ID** signed in, so
   the agent has nothing sensitive to reach.
-- **Drive it over SSH** from your main Mac on the local network, and control it from
+- **Drive it over SSH** from your main Mac on your local network, and control it from
   your phone.
 
 ## What you need
