@@ -26,7 +26,7 @@ combination of two machines.
 
 ## Why this setup?
 
-First, let me quickly address a few questions you might have.
+First, let's quickly address a few questions you might have.
 
 ### Why not run it in a container?
 
