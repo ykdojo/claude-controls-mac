@@ -31,7 +31,7 @@ First, let's quickly address a few questions you might have.
 ### Why not run it in a container?
 
 I'm a big proponent of running it in a container - I even built
-[an entire environment for running it conveniently](https://github.com/ykdojo/safeclaw).
+[an entire environment for doing so conveniently](https://github.com/ykdojo/safeclaw).
 However, I've found it has a few limitations.
 First, it still runs on your main machine, so it's not completely separated. For
 example, network requests it sends still go through your main machine.
