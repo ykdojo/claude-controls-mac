@@ -1,4 +1,4 @@
-# Setting up a dedicated Mac for Claude Code (full access, isolated)
+# How to set up your spare Mac for Claude Code to fully control - a step-by-step guide
 
 How to turn a spare Mac into a remote, full-access machine for running Claude Code,
 controlled over SSH from your main Mac - with secure clipboard sync between the two.
