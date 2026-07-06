@@ -380,6 +380,7 @@ Flags mirror `claude`, and it adds several more subcommands:
 ic               # new claude session
 ic -c            # continue the most recent conversation (forwards to: claude -c)
 ic -r            # resume picker (forwards to: claude -r)
+ic --chrome      # with Claude in Chrome (forwards to: claude --chrome; Chrome opens on the box)
 ic sh            # a plain shell on the box, no claude (alias: ic shell)
 ic rc            # Remote Control: drive the box from your phone (claude remote-control)
 ic history       # stored conversations: count, location, recent w/ previews (alias: hist)
