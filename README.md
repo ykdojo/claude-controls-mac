@@ -119,7 +119,7 @@ privileges`, give your terminal app Full Disk Access first:
 ## 3. Passwordless sudo for the target account
 
 This is so the agent (and your SSH commands) can run admin tasks without a password
-prompt each time. Run this **once on the target** (it
+prompt each time. Run this once on the target (it
 asks for the login password this one time):
 
 ```bash
