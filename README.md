@@ -86,7 +86,6 @@ Software Update).
 
 - Create a **new local user account** (System Settings -> Users & Groups).
 - **I recommend not signing into an Apple ID.** Skip it during setup.
-- Keep it empty: no personal files, no synced accounts.
 
 ### Make the account an admin (if you haven't already)
 
