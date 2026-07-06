@@ -261,9 +261,8 @@ Usage:
 ## 8. Install Claude Code on the target Mac
 
 Send the install command over and run it. From the source Mac you can push it straight
-to the target's clipboard, or run it remotely. The version is pinned for a reproducible
-install (matches [safeclaw](https://github.com/ykdojo/safeclaw); bump it as you like - the
-auto-updater is off, so the box stays on whatever you install):
+to the target's clipboard, or run it remotely. The following command installs a
+specific version, but you can also install `latest` or `stable`:
 
 ```bash
 ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.201'
