@@ -374,7 +374,7 @@ echo 'export IC_BOX="<user>@<target-host>.local"' >> ~/.zshrc   # or edit the de
 ```
 
 Each `ic` spawns its own `claude` session on the box (run several at once) and attaches.
-Flags mirror `claude`:
+Flags mirror `claude`, and it adds several more subcommands:
 
 ```bash
 ic               # new claude session
