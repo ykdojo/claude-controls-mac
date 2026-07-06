@@ -439,11 +439,6 @@ To make the entries appear in System Settings in the first place, trigger a comp
 (`ic`, then ask Claude to "take a screenshot") - macOS adds `tmux` to the list (toggled off) so
 you can switch it on.
 
-The `claude` binary does not need its own grant (verified: with `claude` toggled off and
-only `tmux` on, computer use still works). A bonus: because the grant
-is tied to `tmux`, a `claude` auto-update - which moves its versioned binary path - doesn't
-drop computer-use access. Only a `tmux` upgrade would, which is rare.
-
 ---
 
 ## 12. Install a VPN (optional)
