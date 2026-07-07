@@ -10,8 +10,8 @@ I wanted to create a separate environment Claude Code can control on its own, so
 delegate tasks I don't necessarily want to run on my own machine - certain types of
 research tasks, and development tasks.
 
-Claude Code, especially with the `--dangerously-skip-permissions` flag on, always
-carries some risk when run on your main machine. You can eliminate / mitigate these
+Claude Code, especially with the `--dangerously-skip-permissions` flag on,
+carries inherent risk when run on your main machine. You can eliminate / mitigate these
 risks by creating a separate environment on your spare Mac with everything it needs
 to have access to.
 
