@@ -518,6 +518,12 @@ Then enable it in Claude Code on the target: run `/chrome` in a session and sele
 use `claude --chrome` per session ([`ic --chrome`](#use-it-from-your-mac) from your
 source Mac). If the connection doesn't work, try restarting Chrome once.
 
+To make browser use efficient (element refs from the accessibility tree instead
+of coordinates, no unrequested screenshots), the environment setup from
+[step 9](#9-set-up-an-opinionated-claude-code-friendly-environment-optional)
+adds a "Claude for Chrome" guidance section to `~/.claude/CLAUDE.md` on the
+target. If you skipped that step, re-run the script - it's idempotent.
+
 > **If your source Mac's Chrome also has the extension** signed into the same
 > account, Claude Code can connect to either browser. It prompts you to pick when
 > both are connected, but its local-machine detection can be wrong

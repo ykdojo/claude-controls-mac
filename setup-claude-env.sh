@@ -2,7 +2,7 @@
 #
 # setup-claude-env.sh - configure an opinionated Claude Code environment on a Mac.
 #
-# Items (1-8 are core defaults; 9-10 are opt-in, off by default):
+# Items (1-9 are core defaults; 10-11 are opt-in, off by default):
 #   1. Shell aliases: c, cs, and a claude() wrapper (--fs -> --fork-session)
 #   2. DX plugin from ykdojo/claude-code-tips (installs Xcode Command Line
 #      Tools first if missing, since the plugin marketplace needs git)
@@ -12,16 +12,18 @@
 #   6. context-bar status line
 #   7. .claude.json: autoCompactEnabled false
 #   8. GitHub CLI (gh) into ~/.local/bin (auth separately with 'gh auth login')
-#   9. Playwright MCP (installs Node + Google Chrome, headed)
-#  10. yt-dlp binary + skill
+#   9. Claude in Chrome guidance block in ~/.claude/CLAUDE.md (efficient
+#      browser use: element refs over coordinates, no unrequested screenshots)
+#  10. Playwright MCP (installs Node + Google Chrome, headed)
+#  11. yt-dlp binary + skill
 #
 # Selection:
 #   - Run at a terminal with no flags -> interactive checklist (toggle any item;
 #     core pre-checked, opt-ins unchecked).
 #   - Piped / non-interactive with no flags -> core only (never hangs over SSH).
 #   - Flags skip the menu:
-#       --playwright   enable item 9
-#       --yt-dlp       enable item 10
+#       --playwright   enable item 10
+#       --yt-dlp       enable item 11
 #       --all          enable items 9 and 10
 #       --core         core only, no prompt
 #
@@ -36,7 +38,7 @@ export PATH="$HOME/.local/bin:$PATH"
 log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[skip]\033[0m %s\n' "$*"; }
 
-# Item labels (index 0..9 = items 1..10).
+# Item labels (index 0..10 = items 1..11).
 LABELS=(
   "Shell aliases (c / cs / --fs)"
   "DX plugin (ykdojo/claude-code-tips)"
@@ -46,20 +48,21 @@ LABELS=(
   "context-bar status line"
   "Disable auto-compact"
   "GitHub CLI (gh)"
+  "Claude in Chrome guidance (~/.claude/CLAUDE.md)"
   "Playwright MCP (heavy: Node + Chrome)"
   "yt-dlp binary + skill"
 )
-# Default selection: core (1-8) on, opt-ins (9-10) off.
-SEL=(1 1 1 1 1 1 1 1 0 0)
+# Default selection: core (1-9) on, opt-ins (10-11) off.
+SEL=(1 1 1 1 1 1 1 1 1 0 0)
 
 FLAGS_GIVEN=0
 for arg in "$@"; do
   case "$arg" in
-    --playwright) SEL[8]=1;  FLAGS_GIVEN=1 ;;
-    --yt-dlp)     SEL[9]=1;  FLAGS_GIVEN=1 ;;
-    --all)        SEL[8]=1; SEL[9]=1; FLAGS_GIVEN=1 ;;
+    --playwright) SEL[9]=1;  FLAGS_GIVEN=1 ;;
+    --yt-dlp)     SEL[10]=1; FLAGS_GIVEN=1 ;;
+    --all)        SEL[9]=1; SEL[10]=1; FLAGS_GIVEN=1 ;;
     --core)       FLAGS_GIVEN=1 ;;
-    -h|--help)    sed -n '2,33p' "$0"; exit 0 ;;
+    -h|--help)    sed -n '2,35p' "$0"; exit 0 ;;
     *) echo "Unknown option: $arg" >&2; exit 1 ;;
   esac
 done
@@ -188,8 +191,10 @@ setup_gh() {
   ensure_clt   # gh repo clone / pr checkout shell out to git
   local arch ver tmp
   arch=amd64; [ "$(uname -m)" = "arm64" ] && arch=arm64
+  # jq (not grep -m1) so the pipe consumes the whole response - grep exiting
+  # early makes curl fail with a write error under pipefail
   ver=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest \
-        | grep -m1 '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')
+        | jq -r '.tag_name | ltrimstr("v")')
   [ -n "$ver" ] || { warn "could not resolve latest gh version"; return 0; }
   tmp=$(mktemp -d)
   curl -fsSL "https://github.com/cli/cli/releases/download/v${ver}/gh_${ver}_macOS_${arch}.zip" -o "$tmp/gh.zip"
@@ -200,7 +205,27 @@ setup_gh() {
   log "gh ${ver} installed - run 'gh auth login' to authenticate"
 }
 
-# --- 9. Playwright MCP (Google Chrome, headed) ------------------------------
+# --- 9. Claude in Chrome guidance -> ~/.claude/CLAUDE.md --------------------
+setup_chrome_claudemd() {
+  log "Claude in Chrome guidance -> ~/.claude/CLAUDE.md"
+  local md="$CLAUDE_DIR/CLAUDE.md"
+  touch "$md"
+  if grep -qF "<!-- >>> claude-env chrome >>> -->" "$md"; then
+    sed -i '' '/<!-- >>> claude-env chrome >>> -->/,/<!-- <<< claude-env chrome <<< -->/d' "$md"
+  fi
+  cat >> "$md" <<'EOF'
+<!-- >>> claude-env chrome >>> -->
+# Claude for Chrome
+
+- Use `read_page` to get element refs from the accessibility tree
+- Use `find` to locate elements by description
+- Click/interact using `ref`, not coordinates
+- NEVER take screenshots unless explicitly requested by the user
+<!-- <<< claude-env chrome <<< -->
+EOF
+}
+
+# --- 10. Playwright MCP (Google Chrome, headed) -----------------------------
 setup_playwright() {
   log "Playwright MCP (installs Node if missing, then Google Chrome)"
   if ! command -v node >/dev/null; then
@@ -218,7 +243,7 @@ setup_playwright() {
   claude mcp add playwright -- playwright-mcp --browser chrome || true
 }
 
-# --- 10. yt-dlp -------------------------------------------------------------
+# --- 11. yt-dlp -------------------------------------------------------------
 setup_ytdlp() {
   log "yt-dlp binary + skill"
   mkdir -p "$HOME/.local/bin" "$CLAUDE_DIR/skills/yt-dlp"
@@ -235,7 +260,8 @@ if [ "${SEL[1]}" = 1 ]; then ensure_clt; setup_dx_plugin; fi
 apply_settings                                   # items 3-6, internally gated
 [ "${SEL[6]}" = 1 ] && setup_autocompact
 [ "${SEL[7]}" = 1 ] && setup_gh
-if [ "${SEL[8]}" = 1 ]; then setup_playwright; fi
-[ "${SEL[9]}" = 1 ] && setup_ytdlp
+[ "${SEL[8]}" = 1 ] && setup_chrome_claudemd
+if [ "${SEL[9]}" = 1 ]; then setup_playwright; fi
+[ "${SEL[10]}" = 1 ] && setup_ytdlp
 
 log "Done. Open a new shell (or 'source ~/.zshrc') to pick up the aliases."
