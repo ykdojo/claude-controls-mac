@@ -40,6 +40,7 @@ Usage:
   ic -r              resume picker (forwards: claude -r)
   ic <claude flags>  any other args forward to claude
   ic sh              a plain shell on the box (no claude; alias: ic shell)
+  ic vnc             open Screen Sharing (VNC) to the box
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it;
                         alias: ic remote-control)
@@ -127,6 +128,12 @@ RSCRIPT
     # has GUI access (screencapture etc. work), unlike a plain `ssh` shell.
     sess="ic-sh-$(date +%H%M%S)-$$"
     exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess zsh"
+    ;;
+
+  vnc)
+    # Screen Sharing accepts vnc://user@host, so BOX works as-is (the username
+    # is prefilled). Requires Screen Sharing enabled on the box (README step 15).
+    open "vnc://$BOX"
     ;;
 
   rc|remote-control)

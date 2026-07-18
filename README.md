@@ -384,6 +384,7 @@ ic -c            # continue the most recent conversation (forwards to: claude -c
 ic -r            # resume picker (forwards to: claude -r)
 ic --chrome      # with Claude in Chrome (forwards to: claude --chrome)
 ic sh            # a plain shell on the box, no claude (alias: ic shell)
+ic vnc           # open Screen Sharing (VNC) to the box (see step 15)
 ic rc            # Remote Control: drive the box from your phone (claude remote-control)
 ic history       # stored conversations: count, location, recent w/ previews (alias: hist)
 ic ls            # list live sessions (state, age, what's running, conversation)
