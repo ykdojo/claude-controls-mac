@@ -421,7 +421,9 @@ ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock capture-pane -t <sessi
 ### One-time grants (can't be scripted)
 
 Screen Recording and Accessibility can only be granted in the GUI, and a human has to do it at
-the machine (in person or via Screen Sharing) - macOS blocks synthetic clicks on these prompts.
+the machine (in person or via
+[Screen Sharing](#15-enable-screen-sharing-on-the-target-mac-optional)) - macOS blocks
+synthetic clicks on these prompts.
 On first capture you'll also **Allow** a *"bypass the window picker"* prompt (recurs ~monthly).
 
 **The grants go on `tmux`, not `claude`.** macOS attributes
@@ -506,7 +508,7 @@ Enterprise).
 
 You can ask the box's Claude to install Chrome and open the extension's Chrome Web
 Store page. The parts it can't do alone (do these at the machine, in person or via
-Screen Sharing):
+[Screen Sharing](#15-enable-screen-sharing-on-the-target-mac-optional)):
 
 - **Click "Add to Chrome".** Optionally, you can pin the extension to the toolbar
   by going to `chrome://extensions`.
@@ -535,3 +537,54 @@ Note that sessions spawned from your phone via
 [step 13](#13-control-it-from-your-phone) don't currently get the browser tools
 ([#74671](https://github.com/anthropics/claude-code/issues/74671)) - the
 workaround is to start the session in the terminal and attach with `/rc`.
+
+---
+
+## 15. Enable Screen Sharing on the target Mac (optional)
+
+This lets you see the target's screen live from the source Mac - and take over its
+mouse and keyboard - using macOS's built-in Screen Sharing. It's the easiest way to
+watch what the agent is doing on the box in real time, and it turns every "do this
+at the machine" moment in this guide (the one-time grants in
+[step 11](#11-computer-use-over-ssh-optional), the VPN prompt in
+[step 12](#12-install-a-vpn-or-any-other-app-optional), the Chrome install in
+[step 14](#14-set-up-claude-in-chrome-optional)) into something you can do from
+your desk.
+
+**The one catch: enabling it requires being at the machine once.** Since macOS
+12.1, Screen Sharing
+[can't be enabled from the command line](https://support.apple.com/guide/remote-desktop/enable-remote-management-apd8b1c65bd/mac) -
+the toggle has to be flipped in the GUI. The remote routes only half-work:
+`launchctl bootstrap` on `com.apple.screensharing` starts a listener on port 5900,
+and the ARD `kickstart` tool activates Remote Management, but either way connecting
+fails with *"Screen Sharing is not permitted ... Disable and re-enable Screen
+Sharing or Remote Management in System Settings."*
+
+On the target: **System Settings -> General -> Sharing -> Screen Sharing** on, and
+check that your account is allowed (click the ⓘ). If **Remote Management** is on,
+the Screen Sharing toggle is hidden - turn Remote Management off first (the two are
+mutually exclusive, and Remote Management enabled via `kickstart` is view-only
+anyway).
+
+Connect from the source Mac:
+
+```bash
+open vnc://<user>@<target-host>.local
+```
+
+(or Finder -> Go -> Connect to Server with the same address). Log in with the
+target account's login password and tick **Remember this password in my keychain** -
+after that it's one command to the live desktop. If `.local` isn't resolving at
+that moment (it can be flaky over Wi-Fi), use the target's IP instead.
+
+From a phone, use an app that speaks Apple's screen sharing protocol, like
+[Screens](https://edovia.com/screens/) or [Jump Desktop](https://jumpdesktop.com/) -
+add the same address and credentials. Generic VNC apps won't connect: they rely on
+the weaker legacy VNC password mode, which stays off in this setup.
+
+Security-wise, this reuses the account's macOS login credentials (nothing new is
+stored on the target), Mac-to-Mac sessions are AES-128 encrypted, and port 5900 is
+only reachable from your local network.
+
+One caveat: if you connect while the agent is mid-computer-use, you share one
+cursor - watch without touching, or you'll fight it for the mouse.
