@@ -535,3 +535,26 @@ Note that sessions spawned from your phone via
 [step 13](#13-control-it-from-your-phone) don't currently get the browser tools
 ([#74671](https://github.com/anthropics/claude-code/issues/74671)) - the
 workaround is to start the session in the terminal and attach with `/rc`.
+
+---
+
+## 15. Enable Screen Sharing on the target Mac (optional)
+
+This lets you see the target's screen live from the source Mac - and take over its
+mouse and keyboard - using macOS's built-in Screen Sharing.
+
+This has to be enabled in the GUI at the machine - since macOS 12.1 it
+[can't be enabled from the command line](https://support.apple.com/guide/remote-desktop/enable-remote-management-apd8b1c65bd/mac).
+
+On the target: **System Settings -> General -> Sharing -> Screen Sharing** on. If
+**Remote Management** is on, the Screen Sharing toggle may be hidden - turn it off
+first.
+
+Then connect from the source Mac:
+
+```bash
+open vnc://<user>@<target-host>.local
+```
+
+Log in with the target account's login password and tick **Remember this password
+in my keychain**.
