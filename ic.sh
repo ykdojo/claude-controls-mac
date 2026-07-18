@@ -46,7 +46,9 @@ Usage:
   ic history         stored conversations: count, location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
-  ic kill <id>       kill a session (alias: ic k); 'ic kill all' kills all
+  ic kill <id>       kill a session (alias: ic k)
+  ic kill-all        kill all sessions
+  ic kill-except <id> <id> ...   kill all sessions except the listed ones (space-separated)
   ic -h | --help     this help
 
 Config: set IC_BOX to <user>@<host> (default: yk2@newmacbook.local).
@@ -106,7 +108,8 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
 done
 echo ""
 echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-A then D)"
-echo "kill:   ic kill <id>     (alias: ic k; 'ic kill all' kills all)"
+echo "kill:   ic kill <id>     (alias: ic k)"
+echo "        ic kill-all      / ic kill-except <id> <id> ...   (keeps only the listed ones)"
 RSCRIPT
     ;;
 
@@ -173,16 +176,42 @@ echo "        ssh <box> \"jq -rs '[.[]|select(.type==\\\"user\\\")][].message.co
 RSCRIPT
     ;;
 
+  kill-all)
+    ssh "$BOX" "tmux -S $SOCK list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-' | xargs -I{} tmux -S $SOCK kill-session -t {} 2>/dev/null || true"
+    echo "Killed all ic sessions."
+    ;;
+
+  kill-except)
+    shift
+    if [ $# -eq 0 ]; then
+      echo "Usage: ic kill-except <id> [<id>...]   (kills all other sessions; see 'ic ls')"; exit 1
+    fi
+    keep=""
+    for k in "$@"; do keep="$keep $(norm "$k")"; done
+    ssh "$BOX" "SOCK='$SOCK' KEEP='$keep' bash -s" <<'RSCRIPT'
+SOCK="${SOCK:-/tmp/cc-tmux.sock}"
+live=$(tmux -S "$SOCK" list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-')
+# refuse to run on a typo: every keep id must match a live session
+for k in $KEEP; do
+  printf '%s\n' "$live" | grep -qx "$k" || { echo "ic: keep target $k not found; nothing killed" >&2; exit 1; }
+done
+n=0
+for s in $live; do
+  case " $KEEP " in *" $s "*) echo "Kept   $s"; continue;; esac
+  tmux -S "$SOCK" kill-session -t "$s" 2>/dev/null && { echo "Killed $s"; n=$((n+1)); }
+done
+echo "Killed $n session(s)."
+RSCRIPT
+    ;;
+
   kill|k)
     id="${2:-}"
-    if [ "$id" = "all" ]; then
-      ssh "$BOX" "tmux -S $SOCK list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-' | xargs -I{} tmux -S $SOCK kill-session -t {} 2>/dev/null || true"
-      echo "Killed all ic sessions."
-      exit 0
-    fi
     if [ -z "$id" ]; then
-      echo "Usage: ic kill <id> | all   (see 'ic ls' for live sessions)"; exit 1
+      echo "Usage: ic kill <id>   (see also: ic kill-all, ic kill-except <id> <id> ...)"; exit 1
     fi
+    case "$id" in
+      all|except) echo "ic: did you mean 'ic kill-$id'?" >&2; exit 1;;
+    esac
     sess="$(norm "$id")"
     ssh "$BOX" "tmux -S $SOCK kill-session -t $sess 2>/dev/null || true"
     echo "Killed $sess."

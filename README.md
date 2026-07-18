@@ -386,7 +386,9 @@ ic rc            # Remote Control: drive the box from your phone (claude remote-
 ic history       # stored conversations: count, location, recent w/ previews (alias: hist)
 ic ls            # list live sessions (state, age, what's running, conversation)
 ic attach <id>   # attach a running session (alias: ic a)
-ic kill <id>     # kill a session (alias: ic k); "ic kill all" kills all
+ic kill <id>     # kill a session (alias: ic k)
+ic kill-all      # kill all sessions
+ic kill-except <id> <id> ...   # kill all sessions except the listed ones
 ic -h            # help
 ```
 
