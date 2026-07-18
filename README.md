@@ -574,7 +574,8 @@ before. And joining the network only gives a device reachability - SSH and
 Screen Sharing still require your key or password on top.
 
 Install on the target (the Homebrew formula works headless over SSH; sign in at
-the URL the last command prints - a free account with GitHub login is fine):
+the URL the last command prints - a free account is fine, using a social login
+such as GitHub):
 
 ```bash
 ssh <user>@<target-host>.local 'brew install tailscale'
@@ -607,7 +608,4 @@ the target (Machines -> **...**), so the box doesn't drop off the network when
 its key expires after ~180 days.
 
 To confirm remote access really works, put the source Mac on a different
-network (e.g. a phone hotspot) and run `ic ls`. `tailscale ping <target-host>`
-shows which path is in use: `via 192.168.x.x` is direct LAN; a public IP or
-`via DERP(...)` is what you'll see when away. (The CLI lives at
-`/Applications/Tailscale.app/Contents/MacOS/Tailscale` if not on your PATH.)
+network (e.g. a phone hotspot) and run `ic ls`.
