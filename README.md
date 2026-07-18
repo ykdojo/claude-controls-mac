@@ -615,5 +615,32 @@ network (e.g. a phone hotspot) and run `ic ls`.
 
 ---
 
+## 17. SSH in from your phone (optional)
+
+With Tailscale from [step 16](#16-access-it-from-anywhere-with-tailscale-optional)
+in place, a phone SSH client can reach the box from anywhere - enough to start
+and check on claude sessions without a Mac.
+
+- Install the Tailscale app on the phone and sign in with the same account. If
+  you enabled device approval, approve the phone in the admin console.
+- Install an SSH client (e.g. Termius) and add the box: address
+  `<target-host>`, user `<user>`, and the account's login password.
+
+Don't run `claude` directly in the SSH shell - it dies with the connection and
+has no GUI access. Create sessions on the GUI tmux socket instead, exactly as
+`ic` does:
+
+```bash
+tmux -S /tmp/cc-tmux.sock new-session -s ic-phone 'claude --dangerously-skip-permissions'
+tmux -S /tmp/cc-tmux.sock ls              # list sessions
+tmux -S /tmp/cc-tmux.sock attach -t <id>  # attach (detach: Ctrl-A then D)
+```
+
+Sessions persist across disconnects, and because they land on the GUI tmux
+server, computer use works from the phone too. Store the commands as snippets
+in your SSH client so you only type them once.
+
+---
+
 If you want more Claude Code and agentic coding tips, feel free to subscribe to
 my newsletter, [Agentic Coding with Discipline and Skill](https://agenticcoding.substack.com/).
