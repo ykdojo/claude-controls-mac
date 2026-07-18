@@ -559,4 +559,4 @@ open vnc://<user>@<target-host>.local
 ```
 
 Log in with the target account's login password and tick **Remember this password
-in my keychain** - after that it's one command to the live desktop.
+in my keychain**.
