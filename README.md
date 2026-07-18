@@ -574,8 +574,7 @@ before. And joining the network only gives a device reachability - SSH and
 Screen Sharing still require your key or password on top.
 
 Install on the target (the Homebrew formula works headless over SSH; sign in at
-the URL the last command prints - a free account is fine, using a social login
-such as GitHub):
+the URL the last command prints - a free account with a social login is fine):
 
 ```bash
 ssh <user>@<target-host>.local 'brew install tailscale'
