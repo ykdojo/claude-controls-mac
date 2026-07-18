@@ -548,9 +548,9 @@ mouse and keyboard - using macOS's built-in Screen Sharing.
 This has to be enabled in the GUI at the machine - since macOS 12.1 it
 [can't be enabled from the command line](https://support.apple.com/guide/remote-desktop/enable-remote-management-apd8b1c65bd/mac).
 
-On the target: **System Settings -> General -> Sharing -> Screen Sharing** on, and
-check that your account is allowed (click the ⓘ). If **Remote Management** is on,
-the Screen Sharing toggle is hidden - turn it off first.
+On the target: **System Settings -> General -> Sharing -> Screen Sharing** on. If
+**Remote Management** is on, the Screen Sharing toggle is hidden - turn it off
+first.
 
 Then connect from the source Mac:
 
