@@ -421,9 +421,7 @@ ssh <user>@<target-host>.local "tmux -S /tmp/cc-tmux.sock capture-pane -t <sessi
 ### One-time grants (can't be scripted)
 
 Screen Recording and Accessibility can only be granted in the GUI, and a human has to do it at
-the machine (in person or via
-[Screen Sharing](#15-enable-screen-sharing-on-the-target-mac-optional)) - macOS blocks
-synthetic clicks on these prompts.
+the machine (in person or via Screen Sharing) - macOS blocks synthetic clicks on these prompts.
 On first capture you'll also **Allow** a *"bypass the window picker"* prompt (recurs ~monthly).
 
 **The grants go on `tmux`, not `claude`.** macOS attributes
@@ -508,7 +506,7 @@ Enterprise).
 
 You can ask the box's Claude to install Chrome and open the extension's Chrome Web
 Store page. The parts it can't do alone (do these at the machine, in person or via
-[Screen Sharing](#15-enable-screen-sharing-on-the-target-mac-optional)):
+Screen Sharing):
 
 - **Click "Add to Chrome".** Optionally, you can pin the extension to the toolbar
   by going to `chrome://extensions`.
