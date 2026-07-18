@@ -4,6 +4,8 @@ Here's a full step-by-step guide on how to turn your spare Mac into an always-on
 machine Claude Code can fully control, with computer use enabled. You'll be able to talk to it from your phone
 through the Claude app, or from your main Mac over SSH.
 
+In case you're reading this on GitHub Pages, here's [the repo](https://github.com/ykdojo/claude-controls-mac).
+
 ## Why do this?
 
 I wanted to create a separate environment Claude Code can control on its own, so I can
