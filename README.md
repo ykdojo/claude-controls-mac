@@ -558,3 +558,53 @@ open vnc://<user>@<target-host>.local
 
 Log in with the target account's login password and tick **Remember this password
 in my keychain**.
+
+---
+
+## 16. Access it from anywhere with Tailscale (optional)
+
+`.local` names only resolve on your LAN, so everything so far is local-network
+only (except phone control from [step 13](#13-control-it-from-your-phone), which
+relays through Anthropic). [Tailscale](https://tailscale.com) fixes that: it
+connects your machines with peer-to-peer, end-to-end encrypted
+[WireGuard](https://www.wireguard.com) tunnels, so SSH, `ic`, `clip`, and Screen
+Sharing work from any network with nothing exposed to the public internet. On
+your home network it takes a direct LAN path, so local use stays as fast as
+before. And joining the network only gives a device reachability - SSH and
+Screen Sharing still require your key or password on top.
+
+Install on the target (the Homebrew formula works headless over SSH; sign in at
+the URL the last command prints - a free account with a social login is fine):
+
+```bash
+ssh <user>@<target-host>.local 'brew install tailscale'
+ssh <user>@<target-host>.local 'sudo brew services start tailscale'
+ssh <user>@<target-host>.local 'sudo tailscale up --operator=<user>'
+```
+
+Install on the source, then open the Tailscale app and log in **with the same
+account** - devices only see each other within one account's network:
+
+```bash
+brew install --cask tailscale-app
+```
+
+With MagicDNS (on by default) the target is reachable by bare hostname from
+anywhere - the same address, minus `.local`. Switch `IC_BOX` in `~/.zshrc`,
+keeping the original name for reference:
+
+```bash
+export IC_BOX="<user>@<target-host>"          # Tailscale - works remotely too
+# export IC_BOX="<user>@<target-host>.local"  # original - local network only
+```
+
+Screen Sharing works the same way: `open vnc://<user>@<target-host>`.
+
+Recommended, in the [admin console](https://login.tailscale.com/admin):
+**device approval** (Settings -> Device management), so a compromised Tailscale
+login alone can't add a device to your network, and **disable key expiry** on
+the target (Machines -> **...**), so the box doesn't drop off the network when
+its key expires after ~180 days.
+
+To confirm remote access really works, put the source Mac on a different
+network (e.g. a phone hotspot) and run `ic ls`.
