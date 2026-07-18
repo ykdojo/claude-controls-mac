@@ -47,7 +47,7 @@ Usage:
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
   ic kill <id>       kill a session (alias: ic k); 'ic kill all' kills all
-  ic kill except <id>...   kill all sessions except the listed ones
+  ic kill except <id> <id> ...   kill all sessions except the listed ones (space-separated)
   ic -h | --help     this help
 
 Config: set IC_BOX to <user>@<host> (default: yk2@newmacbook.local).
@@ -107,7 +107,8 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
 done
 echo ""
 echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-A then D)"
-echo "kill:   ic kill <id>     (alias: ic k; 'ic kill all' kills all; 'ic kill except <id>...' keeps only those)"
+echo "kill:   ic kill <id>     (alias: ic k; 'ic kill all' kills all)"
+echo "        ic kill except <id> <id> ...   kills everything but the listed sessions (space-separated)"
 RSCRIPT
     ;;
 
