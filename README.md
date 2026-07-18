@@ -4,7 +4,7 @@ Here's a full step-by-step guide on how to turn your spare Mac into an always-on
 machine Claude Code can fully control, with computer use enabled. You'll be able to talk to it from your phone
 through the Claude app, or from your main Mac over SSH.
 
-In case you're reading this on GitHub Pages, here's [the repo](https://github.com/ykdojo/claude-controls-mac).
+In case you're reading this on GitHub Pages, here's [the repo version](https://github.com/ykdojo/claude-controls-mac).
 
 ## Why do this?
 
@@ -612,3 +612,8 @@ its key expires after ~180 days.
 
 To confirm remote access really works, put the source Mac on a different
 network (e.g. a phone hotspot) and run `ic ls`.
+
+---
+
+If you want more Claude Code and agentic coding tips, feel free to subscribe to
+my newsletter, [Agentic Coding with Discipline and Skill](https://agenticcoding.substack.com/).
