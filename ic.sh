@@ -75,7 +75,7 @@ case "${1:-}" in
     ssh "$BOX" "SOCK='$SOCK' bash -s" <<'RSCRIPT'
 SOCK="${SOCK:-/tmp/cc-tmux.sock}"
 proj=$(echo "$HOME" | sed 's:/:-:g'); pdir="$HOME/.claude/projects/$proj"; sdir="$HOME/.claude/sessions"
-sessions=$(tmux -S "$SOCK" list-sessions -F '#{session_name}|#{session_attached}|#{session_created}' 2>/dev/null | grep '^ic-')
+sessions=$(tmux -S "$SOCK" list-sessions -F '#{session_name}|#{session_attached}|#{session_created}' 2>/dev/null | grep '^ic-' | sort -t'|' -k3,3nr)
 [ -z "$sessions" ] && { echo "No live ic sessions."; exit 0; }
 now=$(date +%s)
 fmt_age() {
