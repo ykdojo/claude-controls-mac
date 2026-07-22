@@ -53,7 +53,7 @@ Usage:
   ic -h | --help     this help
 
 Config: set IC_BOX to <user>@<host> (default: yk2@newmacbook.local).
-Detach from a session with Ctrl-A then D; reattach with: ic attach <id>
+Detach from a session with Ctrl-] then D; reattach with: ic attach <id>
 EOF
 }
 
@@ -108,7 +108,7 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
   printf "%-20s %-9s %-7s %-10s %s\n" "$name" "$state" "$age" "$proc" "$conv"
 done
 echo ""
-echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-A then D)"
+echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-] then D)"
 echo "kill:   ic kill <id>     (alias: ic k)"
 echo "        ic kill-all      / ic kill-except <id> <id> ...   (keeps only the listed ones)"
 RSCRIPT

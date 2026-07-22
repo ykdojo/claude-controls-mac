@@ -95,7 +95,7 @@ fi
 # 1. LaunchAgent: keep a tmux server alive in the GUI login session.
 #    tmux daemonizes, so launchd cannot supervise the server process directly.
 #    Instead the job runs a zsh wrapper that (re)creates the anchor session,
-#    sets server options (C-a prefix like screen; no status bar), then blocks in
+#    sets server options (C-] prefix - unused by Claude Code and zsh; no status bar), then blocks in
 #    the foreground while the anchor lives. If the server dies the wrapper
 #    returns and KeepAlive restarts it. A tmux server with zero sessions exits,
 #    so the always-present `cc` anchor is what keeps it alive between ic sessions.
@@ -104,7 +104,7 @@ mkdir -p "$HOME/Library/LaunchAgents"
 #    The after-load-buffer hook mirrors tmux buffers into the Mac pasteboard:
 #    claude's /copy runs `tmux load-buffer` (it never calls pbcopy), so without
 #    this the copied text is invisible to `clip get` from the source Mac.
-WRAP="$TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null || $TMUX_BIN -S $SOCK new-session -d -s $SESSION; $TMUX_BIN -S $SOCK set -g prefix C-a; $TMUX_BIN -S $SOCK set -g prefix2 C-b; $TMUX_BIN -S $SOCK set -g status off; $TMUX_BIN -S $SOCK set-hook -g after-load-buffer 'run-shell \"$TMUX_BIN -S $SOCK save-buffer - | pbcopy\"'; while $TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null; do sleep 5; done"
+WRAP="$TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null || $TMUX_BIN -S $SOCK new-session -d -s $SESSION; $TMUX_BIN -S $SOCK set -g prefix C-]; $TMUX_BIN -S $SOCK set -g status off; $TMUX_BIN -S $SOCK set-hook -g after-load-buffer 'run-shell \"$TMUX_BIN -S $SOCK save-buffer - | pbcopy\"'; while $TMUX_BIN -S $SOCK has-session -t $SESSION 2>/dev/null; do sleep 5; done"
 cat > "$PLIST" <<PLISTEOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
