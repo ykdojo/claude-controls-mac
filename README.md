@@ -267,7 +267,7 @@ to the target's clipboard, or run it remotely. The following command installs a
 specific version, but you can also install `latest` or `stable` if you'd like:
 
 ```bash
-ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.201'
+ssh <user>@<target-host>.local 'curl -fsSL https://claude.ai/install.sh | bash -s -- 2.1.219'
 ```
 
 The native installer may warn that `~/.local/bin` is not on PATH. Fix it on the target by
