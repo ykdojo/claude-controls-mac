@@ -15,6 +15,7 @@
 #   ic -c              # forwards to: claude -c   (continue)
 #   ic -r              # forwards to: claude -r   (resume picker)
 #   ic <claude flags>  # any other args forward to claude
+#   ic -C '~/repo' ... # start the session in that path on the box (alias: --cd)
 #   ic ls              # list live ic-* sessions (state, age, proc, conversation)
 #   ic attach <id>     # attach a running session (alias: ic a)
 #
@@ -39,6 +40,9 @@ Usage:
   ic -c              continue the most recent conversation (forwards: claude -c)
   ic -r              resume picker (forwards: claude -r)
   ic <claude flags>  any other args forward to claude
+  ic -C '~/repo'     start in that path on the box (alias: --cd). Must be the
+                       FIRST argument, and quote the ~. New sessions only:
+                       ic, ic sh, ic rc
   ic sh              a plain shell on the box (no claude; alias: ic shell)
   ic vnc             open Screen Sharing (VNC) to the box
   ic rc              Remote Control: drive the box from your phone
@@ -59,6 +63,53 @@ EOF
 
 # Normalize a session id: accept "ic-1234", "1234", and map to full name.
 norm() { case "$1" in ic-*) printf '%s' "$1";; *) printf 'ic-%s' "$1";; esac; }
+
+# Single-quote a string for the box's shell, so nothing in a path ($, backticks,
+# spaces, quotes) is expanded or run there:  it's  ->  'it'\''s'
+sq() { printf "'%s'" "${1//\'/\'\\\'\'}"; }
+
+# Create a GUI-session tmux session on the box and attach in one step. $1 is the
+# session name, $2 the command *as the box's shell should see it* (so a multi-word
+# command arrives pre-quoted). Every session goes through here, so the socket, the
+# -C working dir and the attach behaviour are decided in one place.
+new_session() { exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $1 $cdopt $2"; }
+
+# -C <path>: the working directory for a new session (ic, ic sh, ic rc), passed
+# to tmux new-session -c. Consumed here, so the remaining args dispatch below as
+# usual. Home-relative paths must stay relative, because the box has its own home
+# dir: that covers both a quoted ~ (which reaches this script intact) and an
+# unquoted one (which your local shell already turned into *this* Mac's $HOME).
+# Anything else is passed through as-is, so relative paths resolve against the
+# box's home dir - the login dir of the ssh session.
+cdopt=""
+case "${1:-}" in
+  -C|--cd)
+    dir="${2:-}"
+    [ -z "$dir" ] && { echo "ic: $1 needs a path (e.g. ic -C '~/repo')" >&2; exit 1; }
+    rest=""; home_rel=no; expanded=no
+    # shellcheck disable=SC2088  # the ~ patterns match a literal tilde on purpose
+    case "$dir" in
+      "~")         home_rel=yes;;
+      "~/"*)       home_rel=yes; rest="/${dir#\~/}";;
+      "$HOME")     home_rel=yes; expanded=yes;;
+      "$HOME"/*)   home_rel=yes; expanded=yes; rest="/${dir#"$HOME"/}";;
+    esac
+    if [ "$home_rel" = yes ]; then
+      [ "$expanded" = yes ] && echo "ic: -C $dir is under this Mac's home; using ~$rest on the box" >&2
+      cdopt="-c \"\$HOME\"${rest:+$(sq "$rest")}"
+    else
+      cdopt="-c $(sq "$dir")"
+    fi
+    shift 2
+    # Only the branches that create a session can honour it; the subcommands
+    # below would silently drop it, so say no instead of pretending. Anything
+    # else is a claude flag (open-ended) and lands on a new session.
+    case "${1:-}" in
+      -h|--help|help|ls|attach|a|vnc|history|hist|kill|k|kill-all|kill-except)
+        echo "ic: -C does not apply to 'ic $1' - only to a new session (ic, ic sh, ic rc)" >&2; exit 1;;
+    esac
+    ;;
+esac
 
 case "${1:-}" in
   -h|--help|help)
@@ -127,7 +178,7 @@ RSCRIPT
     # A plain shell in a fresh GUI-session tmux session (no claude) - persists and
     # has GUI access (screencapture etc. work), unlike a plain `ssh` shell.
     sess="ic-sh-$(date +%H%M%S)-$$"
-    exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess zsh"
+    new_session "$sess" zsh
     ;;
 
   vnc)
@@ -144,7 +195,7 @@ RSCRIPT
     shift
     sess="ic-rc-$(date +%H%M%S)-$$"
     # bypassPermissions: phone-spawned sessions auto-approve too (isolated box).
-    exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess \"claude remote-control --permission-mode bypassPermissions $*\""
+    new_session "$sess" "\"claude remote-control --permission-mode bypassPermissions $*\""
     ;;
 
   history|hist)
@@ -231,6 +282,6 @@ RSCRIPT
     # --dangerously-skip-permissions: the box is a throwaway sandbox, so
     # auto-approve everything (no permission prompts).
     sess="ic-$(date +%H%M%S)-$$"
-    exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess \"claude --dangerously-skip-permissions $*\""
+    new_session "$sess" "\"claude --dangerously-skip-permissions $*\""
     ;;
 esac

@@ -383,6 +383,11 @@ ic               # new claude session
 ic -c            # continue the most recent conversation (forwards to: claude -c)
 ic -r            # resume picker (forwards to: claude -r)
 ic --chrome      # with Claude in Chrome (forwards to: claude --chrome)
+ic -C '~/repo'   # start in that path on the box, not the home dir (alias: --cd)
+                 #   must be the FIRST argument; new sessions only, so ic, ic sh
+                 #   and ic rc take it and everything else refuses it
+                 #   quote the ~, else your local shell expands it to this Mac's
+                 #   home (ic maps that back to the box's home and tells you)
 ic sh            # a plain shell on the box, no claude (alias: ic shell)
 ic vnc           # open Screen Sharing (VNC) to the box (see step 15)
 ic rc            # Remote Control: drive the box from your phone (claude remote-control)
