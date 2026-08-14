@@ -48,7 +48,8 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it;
                         alias: ic remote-control)
-  ic history         stored conversations: count, location, recent (alias: hist)
+  ic history         stored conversations in every project dir: count,
+                       location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
   ic kill <id>       kill a session (alias: ic k)
@@ -202,37 +203,71 @@ RSCRIPT
     ;;
 
   history|hist)
-    # Overview of stored conversations for the box's project ($HOME). Each ic
-    # session runs in $HOME, so they all collect in one project dir.
+    # Overview of stored conversations across every project dir on the box: a
+    # plain ic session runs in $HOME, but ic -C <path> gives that path its own
+    # project dir, so listing only the $HOME one would hide those conversations.
     ssh "$BOX" 'bash -s' <<'RSCRIPT'
-proj=$(echo "$HOME" | sed 's:/:-:g')
-d="$HOME/.claude/projects/$proj"
-ls "$d"/*.jsonl >/dev/null 2>&1 || { echo "No conversations yet in $d"; exit 0; }
-n=$(ls "$d"/*.jsonl | wc -l | tr -d ' ')
-size=$(du -sh "$d" 2>/dev/null | awk '{print $1}')
-echo "Conversations (project $HOME)"
-echo "  $d"
-echo "  $n total · ${size:-?}"
+projects="$HOME/.claude/projects"
+files=$(ls -t "$projects"/*/*.jsonl 2>/dev/null)
+[ -z "$files" ] && { echo "No conversations yet in $projects"; exit 0; }
+W=27   # width of the project column, shared by the header rows and short()
+# The dir name can't be turned back into a cwd (see the note in 'ic ls'), so read
+# the real cwd from the first transcript line that carries one.
+cwd_of() {
+  c=$(head -40 "$1" | jq -r 'select(.cwd != null) | .cwd' 2>/dev/null | head -1)
+  [ -n "$c" ] || c="$(basename "$(dirname "$1")") (?)"
+  printf '%s' "$c"
+}
+# $HOME as ~, and keep the tail of a long path (the distinguishing end), then pad
+# to $W *characters*. printf's %-Ns pads by bytes, so a path with any non-ASCII
+# character would shift this column; ${#p} counts what the terminal shows.
+short() {
+  p=$(printf '%s' "$1" | sed "s:^$HOME:~:")
+  [ ${#p} -le $((W - 1)) ] || p="..$(printf '%s' "$p" | rev | cut -c1-$((W - 3)) | rev)"
+  printf '%s%*s' "$p" "$(( ${#p} < W ? W - ${#p} : 0 ))" ""
+}
+# KB, so the header total is exactly the sum of the per-project rows below
+kb_of() { du -sk "$1" 2>/dev/null | awk '{print $1}'; }
+human() { awk -v k="${1:-0}" 'BEGIN{ if (k >= 1048576) printf "%.1fG", k/1048576;
+                                     else if (k >= 1024) printf "%.1fM", k/1024;
+                                     else printf "%dK", k }'; }
+n=$(printf '%s\n' "$files" | wc -l | tr -d ' ')
+# The project dirs, ordered by their newest *transcript*: resuming a conversation
+# appends to its file without touching the dir's mtime, so ordering the dirs
+# themselves would sink the project you are working in below stale ones. The
+# header total and the rows below both come from this list, so they agree.
+dirs=$(printf '%s\n' "$files" | sed 's:/[^/]*$::' | awk '!seen[$0]++')
+total=$(printf '%s\n' "$dirs" | while read -r d; do kb_of "$d"; done | awk '{s+=$1} END{print s+0}')
+echo "Conversations (all projects)"
+echo "  $projects"
+echo "  $n total · $(human "$total")"
+echo ""
+echo "  by project (newest first):"
+printf '%s\n' "$dirs" | while read -r d; do
+  c=$(ls "$d"/*.jsonl | wc -l | tr -d ' ')
+  printf "    %s %4s conv  %6s\n" "$(short "$(cwd_of "$(ls -t "$d"/*.jsonl | head -1)")")" "$c" "$(human "$(kb_of "$d")")"
+done
 echo ""
 echo "  recent:"
-ls -t "$d"/*.jsonl | head -10 | while read -r f; do
+printf '%s\n' "$files" | head -10 | while read -r f; do
   id=$(basename "$f" .jsonl)
   when=$(stat -f '%Sm' -t '%b %d %H:%M' "$f" 2>/dev/null)
   msgs=$(wc -l < "$f" | tr -d ' ')
   prev=$(jq -rs '[.[]|select(.type=="user")][0].message.content
           | if type=="array" then (map(select(.type=="text").text)|join(" ")) else . end' \
-          "$f" 2>/dev/null | tr '\n\t' '  ' | sed 's/  */ /g' | cut -c1-54)
-  printf "  %.8s  %-12s  %4s msg  %s\n" "$id" "$when" "$msgs" "$prev"
+          "$f" 2>/dev/null | tr '\n\t' '  ' | sed 's/  */ /g' | cut -c1-42)
+  printf "  %.8s  %-12s  %4s msg  %s %s\n" "$id" "$when" "$msgs" "$(short "$(cwd_of "$f")")" "$prev"
 done
 echo ""
-echo "  open/continue:  ic -r   (resume picker, has search)"
+echo "  open/continue:  ic -r              (resume picker, has search)"
+echo "                  ic -C <path> -r    (picker for that project)"
 echo ""
 echo "  to search/read, grep or jq the files directly. each is JSONL, one JSON"
 echo "  object per line. key fields:"
 echo "    .type            user | assistant | system | attachment | ...  (filter user/assistant for messages)"
 echo "    .message.content string (user) or array of {type,text,...} blocks (assistant)"
 echo "    .timestamp  .cwd  .gitBranch  .sessionId"
-echo "  e.g.  ssh <box> 'grep -l TERM $d/*.jsonl'"
+echo "  e.g.  ssh <box> 'grep -l TERM $projects/*/*.jsonl'"
 echo "        ssh <box> \"jq -rs '[.[]|select(.type==\\\"user\\\")][].message.content' FILE\""
 RSCRIPT
     ;;
