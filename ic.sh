@@ -125,7 +125,7 @@ case "${1:-}" in
     # to the transcript at ~/.claude/projects/<proj>/<sessionId>.jsonl.
     ssh "$BOX" "SOCK='$SOCK' bash -s" <<'RSCRIPT'
 SOCK="${SOCK:-/tmp/cc-tmux.sock}"
-proj=$(echo "$HOME" | sed 's:/:-:g'); pdir="$HOME/.claude/projects/$proj"; sdir="$HOME/.claude/sessions"
+projects="$HOME/.claude/projects"; sdir="$HOME/.claude/sessions"
 sessions=$(tmux -S "$SOCK" list-sessions -F '#{session_name}|#{session_attached}|#{session_created}' 2>/dev/null | grep '^ic-' | sort -t'|' -k3,3nr)
 [ -z "$sessions" ] && { echo "No live ic sessions."; exit 0; }
 now=$(date +%s)
@@ -153,7 +153,10 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
   conv=""
   if [ "$proc" = claude ]; then
     sid=$(sed -n 's/.*"sessionId":"\([^"]*\)".*/\1/p' "$sdir/$cpid.json")
-    jf="$pdir/$sid.jsonl"
+    # ic -C moves a session off the $HOME project dir, and a dir name is the cwd
+    # with every non-alphanumeric mangled to - (over 200 chars: truncated with a
+    # hash), so it can't be rebuilt from the cwd - find the transcript by id.
+    jf=$(ls "$projects"/*/"$sid.jsonl" 2>/dev/null | head -1)
     [ -f "$jf" ] && conv=$(jq -rs '(last(.[]|select(.type=="ai-title")|.aiTitle)) // (last(.[]|select(.type=="last-prompt")|.lastPrompt)) // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-50)
   elif [ "$proc" = claude-rc ]; then conv="(remote-control host)"; fi
   printf "%-20s %-9s %-7s %-10s %s\n" "$name" "$state" "$age" "$proc" "$conv"
