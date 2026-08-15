@@ -60,6 +60,94 @@ EOF
 # Normalize a session id: accept "ic-1234", "1234", and map to full name.
 norm() { case "$1" in ic-*) printf '%s' "$1";; *) printf 'ic-%s' "$1";; esac; }
 
+# Kill sessions *and* the processes inside them, verifying the processes are
+# actually gone.
+#
+# `tmux kill-session` alone is normally enough - on an idle box it reaps the
+# pane leader and even nohup'd grandchildren. But it fires the signal and
+# returns without checking, so when the box is deep in swap the claude
+# processes can be too wedged to ever act on it: the session disappears while
+# the process lives on, reparented under the tmux server. `ic ls` lists
+# sessions, not processes, so those orphans are invisible to it and pile up -
+# 2026-08-14 the box had 66 of them, up to 18 days old, and had swapped itself
+# to a load of 37. So: walk each doomed session's process tree first, kill the
+# session, then TERM the tree and confirm, escalating to KILL if anything stuck.
+#
+#   reap one    "<session>"          kill one session
+#   reap all    ""                   kill every ic-* session
+#   reap except "<sess> <sess> ..."  kill every ic-* session but these
+reap() {
+  ssh "$BOX" "SOCK='$SOCK' MODE='$1' TARGETS='$2' bash -s" <<'RSCRIPT'
+set -u
+SOCK="${SOCK:-/tmp/cc-tmux.sock}"
+live=$(tmux -S "$SOCK" list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-' || true)
+
+# Refuse to run on a typo: every named session must actually be live.
+case "$MODE" in
+  one|except)
+    for t in $TARGETS; do
+      printf '%s\n' "$live" | grep -qx "$t" ||
+        { echo "ic: $t not found; nothing killed" >&2; exit 1; }
+    done ;;
+esac
+
+case "$MODE" in
+  one) doomed="$TARGETS" ;;
+  all) doomed="$live" ;;
+  except)
+    doomed=""
+    for s in $live; do
+      case " $TARGETS " in *" $s "*) echo "Kept   $s"; continue;; esac
+      doomed="$doomed $s"
+    done ;;
+esac
+
+# Collect the full process tree of each doomed session BEFORE killing it - once
+# the session is gone tmux can no longer tell us which pids belonged to it. One
+# ps snapshot, walked breadth-first, so this stays cheap even when the box is
+# thrashing (repeated pgrep -P forks do not).
+snap=$(ps -eo pid,ppid)
+tree=""
+for s in $doomed; do
+  queue=$(tmux -S "$SOCK" list-panes -t "$s" -F '#{pane_pid}' 2>/dev/null || true)
+  while [ -n "${queue// /}" ]; do
+    next=""
+    for p in $queue; do
+      [ "$p" -gt 1 ] 2>/dev/null || continue   # never touch pid 1 or junk
+      tree="$tree $p"
+      next="$next $(printf '%s\n' "$snap" | awk -v pp="$p" '$2==pp {print $1}')"
+    done
+    queue="$next"
+  done
+done
+
+n=0
+for s in $doomed; do
+  tmux -S "$SOCK" kill-session -t "$s" 2>/dev/null && { echo "Killed $s"; n=$((n+1)); }
+done
+
+# Reap whatever tmux left behind. TERM is enough for claude in practice; KILL is
+# the backstop for anything wedged in uninterruptible sleep. Poll rather than
+# a fixed sleep so the common case (everything already dead) returns instantly.
+if [ -n "${tree// /}" ]; then
+  kill -TERM $tree 2>/dev/null || true
+  left="$tree"
+  for _ in 1 2 3 4 5 6; do
+    still=""
+    for p in $left; do kill -0 "$p" 2>/dev/null && still="$still $p"; done
+    left="$still"
+    [ -z "${left// /}" ] && break
+    sleep 0.5
+  done
+  if [ -n "${left// /}" ]; then
+    kill -KILL $left 2>/dev/null || true
+    echo "Force-killed $(printf '%s' "$left" | wc -w | tr -d ' ') stuck process(es)."
+  fi
+fi
+echo "Killed $n session(s)."
+RSCRIPT
+}
+
 case "${1:-}" in
   -h|--help|help)
     usage
@@ -184,8 +272,7 @@ RSCRIPT
     ;;
 
   kill-all)
-    ssh "$BOX" "tmux -S $SOCK list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-' | xargs -I{} tmux -S $SOCK kill-session -t {} 2>/dev/null || true"
-    echo "Killed all ic sessions."
+    reap all ""
     ;;
 
   kill-except)
@@ -195,20 +282,7 @@ RSCRIPT
     fi
     keep=""
     for k in "$@"; do keep="$keep $(norm "$k")"; done
-    ssh "$BOX" "SOCK='$SOCK' KEEP='$keep' bash -s" <<'RSCRIPT'
-SOCK="${SOCK:-/tmp/cc-tmux.sock}"
-live=$(tmux -S "$SOCK" list-sessions -F '#{session_name}' 2>/dev/null | grep '^ic-')
-# refuse to run on a typo: every keep id must match a live session
-for k in $KEEP; do
-  printf '%s\n' "$live" | grep -qx "$k" || { echo "ic: keep target $k not found; nothing killed" >&2; exit 1; }
-done
-n=0
-for s in $live; do
-  case " $KEEP " in *" $s "*) echo "Kept   $s"; continue;; esac
-  tmux -S "$SOCK" kill-session -t "$s" 2>/dev/null && { echo "Killed $s"; n=$((n+1)); }
-done
-echo "Killed $n session(s)."
-RSCRIPT
+    reap except "$keep"
     ;;
 
   kill|k)
@@ -219,9 +293,7 @@ RSCRIPT
     case "$id" in
       all|except) echo "ic: did you mean 'ic kill-$id'?" >&2; exit 1;;
     esac
-    sess="$(norm "$id")"
-    ssh "$BOX" "tmux -S $SOCK kill-session -t $sess 2>/dev/null || true"
-    echo "Killed $sess."
+    reap one "$(norm "$id")"
     ;;
 
   *)
