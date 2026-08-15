@@ -127,12 +127,18 @@ for s in $doomed; do
 done
 
 # Reap whatever tmux left behind. TERM is enough for claude in practice; KILL is
-# the backstop for anything wedged in uninterruptible sleep.
+# the backstop for anything wedged in uninterruptible sleep. Poll rather than
+# a fixed sleep so the common case (everything already dead) returns instantly.
 if [ -n "${tree// /}" ]; then
   kill -TERM $tree 2>/dev/null || true
-  sleep 3
-  left=""
-  for p in $tree; do kill -0 "$p" 2>/dev/null && left="$left $p"; done
+  left="$tree"
+  for _ in 1 2 3 4 5 6; do
+    still=""
+    for p in $left; do kill -0 "$p" 2>/dev/null && still="$still $p"; done
+    left="$still"
+    [ -z "${left// /}" ] && break
+    sleep 0.5
+  done
   if [ -n "${left// /}" ]; then
     kill -KILL $left 2>/dev/null || true
     echo "Force-killed $(printf '%s' "$left" | wc -w | tr -d ' ') stuck process(es)."
