@@ -44,6 +44,10 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it;
                         alias: ic remote-control)
+  ic push <path> [dest]  send a file/dir to the box (default dest: ~/inbox/; alias: ic p)
+  ic pull <path> [dest]  fetch a file/dir from the box (default dest: current dir)
+                           (box paths go straight to scp: /abs, quoted '~/..',
+                            or relative to the box's home)
   ic history         stored conversations: count, location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
@@ -233,6 +237,31 @@ RSCRIPT
     sess="ic-rc-$(date +%H%M%S)-$$"
     # bypassPermissions: phone-spawned sessions auto-approve too (isolated box).
     exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess \"claude remote-control --permission-mode bypassPermissions $*\""
+    ;;
+
+  push|p)
+    # Send one file/dir to the box. Default destination is ~/inbox/ (created if
+    # missing) so pushed files have one obvious home and nothing on the box gets
+    # overwritten by accident; pass a second path to send somewhere else.
+    shift
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "Usage: ic push <file|dir> [dest]   (dest on the box; default: ~/inbox/)"; exit 1
+    fi
+    dest="${2:-inbox/}"
+    [ $# -eq 1 ] && ssh "$BOX" 'mkdir -p ~/inbox'
+    scp -r "$1" "$BOX:$dest"
+    echo "-> $BOX:$dest"
+    ;;
+
+  pull)
+    # Fetch one file/dir from the box; default destination is the current
+    # directory. Box paths go straight to scp, so /abs, quoted '~/..', and
+    # home-relative all work.
+    shift
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "Usage: ic pull <remote-path> [dest]   (dest local; default: current dir)"; exit 1
+    fi
+    scp -r "$BOX:$1" "${2:-.}"
     ;;
 
   history|hist)
