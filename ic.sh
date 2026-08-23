@@ -44,9 +44,9 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it;
                         alias: ic remote-control)
-  ic push <path> ... send files/dirs to the box's ~/inbox/ (alias: ic p)
-  ic pull <path> ... fetch files/dirs from the box to the current dir
-                       (paths relative to ~ on the box)
+  ic push <path> [dest]  send a file/dir to the box (default dest: ~/inbox/; alias: ic p)
+  ic pull <path> [dest]  fetch a file/dir from the box (default dest: current dir)
+                           (use absolute paths for paths on the box)
   ic history         stored conversations: count, location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
@@ -239,25 +239,27 @@ RSCRIPT
     ;;
 
   push|p)
-    # Send files/dirs to the box. Everything lands in ~/inbox/ so it's obvious
-    # where pushed files live and nothing on the box gets overwritten by accident.
+    # Send one file/dir to the box. Default destination is ~/inbox/ (created if
+    # missing) so pushed files have one obvious home and nothing on the box gets
+    # overwritten by accident; pass a second path to send somewhere else.
     shift
-    if [ $# -eq 0 ]; then
-      echo "Usage: ic push <file|dir> ...   (copies to ~/inbox/ on the box)"; exit 1
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "Usage: ic push <file|dir> [dest]   (dest on the box; default: ~/inbox/)"; exit 1
     fi
-    ssh "$BOX" 'mkdir -p ~/inbox'
-    scp -r "$@" "$BOX:inbox/"
-    for f in "$@"; do echo "-> ~/inbox/$(basename "$f")"; done
+    dest="${2:-inbox/}"
+    [ $# -eq 1 ] && ssh "$BOX" 'mkdir -p ~/inbox'
+    scp -r "$1" "$BOX:$dest"
+    echo "-> $BOX:$dest"
     ;;
 
   pull)
-    # Fetch files/dirs from the box into the current directory. Paths are
-    # relative to ~ on the box unless absolute.
+    # Fetch one file/dir from the box (use absolute remote paths); default
+    # destination is the current directory.
     shift
-    if [ $# -eq 0 ]; then
-      echo "Usage: ic pull <remote-path> ...   (copies here; paths relative to ~ on the box)"; exit 1
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "Usage: ic pull <remote-path> [dest]   (dest local; default: current dir)"; exit 1
     fi
-    for f in "$@"; do scp -r "$BOX:$f" .; done
+    scp -r "$BOX:$1" "${2:-.}"
     ;;
 
   history|hist)
