@@ -44,6 +44,9 @@ Usage:
   ic rc              Remote Control: drive the box from your phone
                        (runs claude remote-control; extra args forward to it;
                         alias: ic remote-control)
+  ic push <path> ... send files/dirs to the box's ~/inbox/ (alias: ic p)
+  ic pull <path> ... fetch files/dirs from the box to the current dir
+                       (paths relative to ~ on the box)
   ic history         stored conversations: count, location, recent (alias: hist)
   ic ls              list live sessions (state, age, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
@@ -233,6 +236,28 @@ RSCRIPT
     sess="ic-rc-$(date +%H%M%S)-$$"
     # bypassPermissions: phone-spawned sessions auto-approve too (isolated box).
     exec ssh "$BOX" -t "tmux -S $SOCK new-session -s $sess \"claude remote-control --permission-mode bypassPermissions $*\""
+    ;;
+
+  push|p)
+    # Send files/dirs to the box. Everything lands in ~/inbox/ so it's obvious
+    # where pushed files live and nothing on the box gets overwritten by accident.
+    shift
+    if [ $# -eq 0 ]; then
+      echo "Usage: ic push <file|dir> ...   (copies to ~/inbox/ on the box)"; exit 1
+    fi
+    ssh "$BOX" 'mkdir -p ~/inbox'
+    scp -r "$@" "$BOX:inbox/"
+    for f in "$@"; do echo "-> ~/inbox/$(basename "$f")"; done
+    ;;
+
+  pull)
+    # Fetch files/dirs from the box into the current directory. Paths are
+    # relative to ~ on the box unless absolute.
+    shift
+    if [ $# -eq 0 ]; then
+      echo "Usage: ic pull <remote-path> ...   (copies here; paths relative to ~ on the box)"; exit 1
+    fi
+    for f in "$@"; do scp -r "$BOX:$f" .; done
     ;;
 
   history|hist)
