@@ -15,7 +15,7 @@
 #   ic -c              # forwards to: claude -c   (continue)
 #   ic -r              # forwards to: claude -r   (resume picker)
 #   ic <claude flags>  # any other args forward to claude
-#   ic ls              # list live ic-* sessions (state, age, proc, conversation)
+#   ic ls              # list live ic-* sessions (state, age, last activity, proc, conversation)
 #   ic attach <id>     # attach a running session (alias: ic a)
 #
 # Config: set IC_BOX to <user>@<host> (default below). IC_SOCK overrides the
@@ -49,7 +49,7 @@ Usage:
                            (box paths go straight to scp: /abs, quoted '~/..',
                             or relative to the box's home)
   ic history         stored conversations: count, location, recent (alias: hist)
-  ic ls              list live sessions (state, age, proc, conversation)
+  ic ls              list live sessions (state, age, last activity, proc, conversation)
   ic attach <id>     attach a running session (alias: ic a)
   ic kill <id>       kill a session (alias: ic k)
   ic kill-all        kill all sessions
@@ -167,7 +167,7 @@ case "${1:-}" in
     ssh "$BOX" "SOCK='$SOCK' bash -s" <<'RSCRIPT'
 SOCK="${SOCK:-/tmp/cc-tmux.sock}"
 proj=$(echo "$HOME" | sed 's:/:-:g'); pdir="$HOME/.claude/projects/$proj"; sdir="$HOME/.claude/sessions"
-sessions=$(tmux -S "$SOCK" list-sessions -F '#{session_name}|#{session_attached}|#{session_created}' 2>/dev/null | grep '^ic-' | sort -t'|' -k3,3nr)
+sessions=$(tmux -S "$SOCK" list-sessions -F '#{session_name}|#{session_attached}|#{session_created}|#{session_activity}' 2>/dev/null | grep '^ic-' | sort -t'|' -k4,4nr)
 [ -z "$sessions" ] && { echo "No live ic sessions."; exit 0; }
 now=$(date +%s)
 fmt_age() {
@@ -176,8 +176,11 @@ fmt_age() {
   elif [ "$t" -ge 3600 ]; then echo "$((t/3600))h$(((t%3600)/60))m"
   elif [ "$t" -ge 60 ]; then echo "$((t/60))m"; else echo "${t}s"; fi
 }
-printf "%-20s %-9s %-7s %-10s %s\n" "SESSION" "STATE" "AGE" "PROC" "CONVERSATION"
-printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
+# Two passes so output streams: sorting needs every row's key up front, so
+# pass 1 resolves each session's process + transcript and its sort key (LAST)
+# without the slow jq title lookup; pass 2 prints rows one at a time in sorted
+# order, fetching each title as its line prints.
+rows=$(printf '%s\n' "$sessions" | while IFS='|' read -r name attached created activity; do
   state=Detached; [ "${attached:-0}" -ge 1 ] 2>/dev/null && state=Attached
   if [ -n "$created" ]; then age=$(fmt_age "$((now - created))"); else age="?"; fi
   # walk the session's pane process tree (a few levels) to find claude
@@ -185,19 +188,35 @@ printf '%s\n' "$sessions" | while IFS='|' read -r name attached created; do
   for p in $pids; do pids="$pids $(pgrep -P "$p" 2>/dev/null)"; done
   for p in $pids; do pids="$pids $(pgrep -P "$p" 2>/dev/null)"; done
   proc=shell; cpid=
-  for p in $pids; do case "$(ps -o command= -p "$p" 2>/dev/null)" in *"claude remote-control"*) proc="claude-rc"; break;; esac; done
+  for p in $pids; do case "$(ps -o command= -p "$p" 2>/dev/null)" in (*"claude remote-control"*) proc="claude-rc"; break;; esac; done
   # the real claude pid is the descendant that has a sessions/<pid>.json (the
   # shell wrapper also carries "claude" in its argv, so don't match on that)
   if [ "$proc" != claude-rc ]; then
     for p in $pids; do [ -f "$sdir/$p.json" ] && { proc=claude; cpid=$p; break; }; done
   fi
-  conv=""
+  jf=""
   if [ "$proc" = claude ]; then
     sid=$(sed -n 's/.*"sessionId":"\([^"]*\)".*/\1/p' "$sdir/$cpid.json")
-    jf="$pdir/$sid.jsonl"
-    [ -f "$jf" ] && conv=$(jq -rs '(last(.[]|select(.type=="ai-title")|.aiTitle)) // (last(.[]|select(.type=="last-prompt")|.lastPrompt)) // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-50)
+    [ -f "$pdir/$sid.jsonl" ] && jf="$pdir/$sid.jsonl"
+  fi
+  # LAST = the newest "timestamp" inside the transcript (mtime lies: idle
+  # claudes touch/rewrite the file without adding messages). Fall back to tmux
+  # activity (then creation) for sessions without a transcript.
+  last="${activity:-${created:-0}}"
+  if [ -n "$jf" ]; then
+    ts=$(tail -c 200000 "$jf" | grep -o '"timestamp":"[^"]*"' | tail -1 | cut -d'"' -f4)
+    [ -n "$ts" ] && last=$(date -j -u -f '%Y-%m-%dT%H:%M:%S' "${ts%%.*}" +%s 2>/dev/null || echo "$last")
+  fi
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$last" "$name" "$state" "$age" "$proc" "$jf"
+done | sort -t"$(printf '\t')" -k1,1nr)
+printf "%-20s %-9s %-7s %-7s %-10s %s\n" "SESSION" "STATE" "AGE" "LAST" "PROC" "CONVERSATION"
+printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r last name state age proc jf; do
+  lastfmt=$(fmt_age "$((now - last))")
+  conv=""
+  if [ "$proc" = claude ] && [ -n "$jf" ]; then
+    conv=$(jq -rs '(last(.[]|select(.type=="ai-title")|.aiTitle)) // (last(.[]|select(.type=="last-prompt")|.lastPrompt)) // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-50)
   elif [ "$proc" = claude-rc ]; then conv="(remote-control host)"; fi
-  printf "%-20s %-9s %-7s %-10s %s\n" "$name" "$state" "$age" "$proc" "$conv"
+  printf "%-20s %-9s %-7s %-7s %-10s %s\n" "$name" "$state" "$age" "$lastfmt" "$proc" "$conv"
 done
 echo ""
 echo "attach: ic attach <id>   (alias: ic a; detach: Ctrl-] then D)"
