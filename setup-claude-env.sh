@@ -7,7 +7,7 @@
 #   2. DX plugin from ykdojo/claude-code-tips (installs Xcode Command Line
 #      Tools first if missing, since the plugin marketplace needs git)
 #   3. settings.json: DISABLE_AUTOUPDATER, promptSuggestionEnabled false
-#   4. settings.json: default model claude-opus-4-8
+#   4. settings.json: default model claude-opus-5-5
 #   5. settings.json: attribution off (commit/pr/sessionUrl)
 #   6. context-bar status line
 #   7. .claude.json: autoCompactEnabled false
@@ -43,7 +43,7 @@ LABELS=(
   "Shell aliases (c / cs / --fs)"
   "DX plugin (ykdojo/claude-code-tips)"
   "Disable auto-updater + prompt suggestions"
-  "Default model: Opus 4.8"
+  "Default model: Opus 5.5"
   "Attribution off (commit / PR / sessionUrl)"
   "context-bar status line"
   "Disable auto-compact"
@@ -163,7 +163,7 @@ setup_statusline_script() {
 apply_settings() {
   local obj='{}'
   [ "${SEL[2]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {env:{DISABLE_AUTOUPDATER:"1"}, promptSuggestionEnabled:false}')
-  [ "${SEL[3]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {model:"claude-opus-4-8"}')
+  [ "${SEL[3]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {model:"claude-opus-5-5"}')
   [ "${SEL[4]}" = 1 ] && obj=$(jq -n --argjson o "$obj" '$o + {attribution:{commit:"",pr:"",sessionUrl:false}}')
   if [ "${SEL[5]}" = 1 ]; then
     setup_statusline_script

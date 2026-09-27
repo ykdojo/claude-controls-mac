@@ -16,7 +16,7 @@ interactive mode you can toggle any combination.
 3. **Disable auto-updater + prompt suggestions** - `settings.json`:
    `DISABLE_AUTOUPDATER=1` and `promptSuggestionEnabled: false` (suppresses the
    speculative next-prompt prefill in the input box).
-4. **Default model** - `settings.json`: pins `claude-opus-4-8`.
+4. **Default model** - `settings.json`: pins `claude-opus-5-5`.
 5. **Attribution off** - `settings.json`: empties the
    [commit/PR attribution](https://github.com/ykdojo/claude-code-tips#disable-commitpr-attribution)
    and sets `sessionUrl: false`, so Claude Code doesn't add itself to commits or PRs.
