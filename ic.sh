@@ -159,8 +159,9 @@ case "${1:-}" in
 
   ls)
     # Each live ic-* tmux session: attach state, age, what's running (interactive
-    # claude / claude remote-control / a plain shell), and the conversation's AI
-    # title (the same one /resume shows; falls back to the last prompt). Starting
+    # claude / claude remote-control / a plain shell), and the conversation's
+    # title: the /rename title if one was set, else the AI title (the same one
+    # /resume shows), else the last prompt. Starting
     # from each session's pane pid, the claude descendant is matched to its
     # conversation via ~/.claude/sessions/<pid>.json (records the sessionId), then
     # to the transcript at ~/.claude/projects/<proj>/<sessionId>.jsonl.
@@ -214,7 +215,7 @@ printf '%s\n' "$rows" | while IFS="$(printf '\t')" read -r last name state age p
   lastfmt=$(fmt_age "$((now - last))")
   conv=""
   if [ "$proc" = claude ] && [ -n "$jf" ]; then
-    conv=$(jq -rs '(last(.[]|select(.type=="ai-title")|.aiTitle)) // (last(.[]|select(.type=="last-prompt")|.lastPrompt)) // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-50)
+    conv=$(jq -rs '(last(.[]|select(.type=="custom-title")|.customTitle)) // (last(.[]|select(.type=="ai-title")|.aiTitle)) // (last(.[]|select(.type=="last-prompt")|.lastPrompt)) // ""' "$jf" 2>/dev/null | tr "\n\t" "  " | sed "s/  */ /g" | cut -c1-50)
   elif [ "$proc" = claude-rc ]; then conv="(remote-control host)"; fi
   printf "%-20s %-9s %-7s %-7s %-10s %s\n" "$name" "$state" "$age" "$lastfmt" "$proc" "$conv"
 done
